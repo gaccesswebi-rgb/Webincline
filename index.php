@@ -610,7 +610,7 @@ require __DIR__ . '/includes/header.php';
               </select>
             </label>
           </div>
-          <label class="fld fld--area"><span class="sr-only">About your business</span><textarea id="f-message" name="message" rows="2" required maxlength="3000" placeholder="What do you sell, and what would you like to grow?"></textarea></label>
+          <label class="fld fld--area"><span class="sr-only">About your business</span><textarea id="f-message" data-lenis-prevent name="message" rows="2" required maxlength="3000" placeholder="What do you sell, and what would you like to grow?"></textarea></label>
           <div class="form__foot">
             <button class="btn btn--solid" type="submit" data-mag><span class="btn__lb">Send message</span><span class="btn__ic"><?= icon('arrow-up') ?></span></button>
             <p class="form__st mono" role="status" aria-live="polite" data-form-status><?php

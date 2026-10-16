@@ -98,7 +98,7 @@ $org_schema = [
     </div>
   </div>
 
-  <div class="mm" id="mobile-menu" data-mobile-menu hidden>
+  <div class="mm" id="mobile-menu" data-mobile-menu data-lenis-prevent hidden>
     <ul class="mm__links">
       <?php foreach ($nav as $i => $item): ?>
         <li><a href="<?= e($item['href']) ?>"><span class="mono"><?= sprintf('%02d', $i + 1) ?></span><?= e($item['label']) ?></a></li>

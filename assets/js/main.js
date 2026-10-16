@@ -18,7 +18,6 @@
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const fmt = (n) => Math.round(n).toLocaleString('en-US');
   const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  const desktop = () => window.matchMedia('(min-width: 961px)').matches;
   const refresh = () => { if (hasGSAP) ScrollTrigger.refresh(); };
 
   /* Run fn every frame only while el is on screen and the tab is visible. */
@@ -42,7 +41,7 @@
   /* ---------------- smooth scroll ---------------- */
   let lenis = null;
   function initSmooth() {
-    if (motion && window.Lenis) {
+    if (motion && window.Lenis && document.compatMode === 'CSS1Compat') {
       lenis = new Lenis({ lerp: 0.1, smoothWheel: true, wheelMultiplier: 1, syncTouch: false, gestureOrientation: 'vertical' });
       window.__lenis = lenis;
       lenis.on('scroll', ScrollTrigger.update);
@@ -59,6 +58,8 @@
       e.preventDefault();
       if (lenis) lenis.scrollTo(target, { offset: -20, duration: 1.4 });
       else target.scrollIntoView({ behavior: motion ? 'smooth' : 'auto' });
+      if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+      target.focus({ preventScroll: true });
       history.replaceState(null, '', id);
     });
   }
@@ -580,6 +581,8 @@
 
   /* ---------------- services accordion ---------------- */
   function initServices() {
+    // the side-by-side accordion needs 1280px; narrower screens get stacked panels (see CSS)
+    const wide = () => window.matchMedia('(min-width: 1280px)').matches;
     const acc = $('[data-acc]');
     if (!acc) return;
     const pns = $$('[data-pn]', acc);
@@ -589,7 +592,7 @@
     let cur = 0, hoverT = 0, pauseUntil = 0, visible = false, serpTimers = [];
 
     const setWidth = () => {
-      if (!desktop()) return;
+      if (!wide()) return;
       const cw = parseFloat(getComputedStyle(acc).getPropertyValue('--cw')) || 92;
       acc.style.setProperty('--ow', Math.max(320, acc.clientWidth - (pns.length - 1) * (cw + 8) - cw) + 'px');
     };
@@ -617,7 +620,7 @@
 
     const open = (i, user) => {
       if (i < 0 || i >= pns.length) return;
-      if (!desktop() && user && i === cur && pns[i].classList.contains('is-open')) {
+      if (!wide() && user && i === cur && pns[i].classList.contains('is-open')) {
         pns[i].classList.remove('is-open');
         $('.pn__sp', pns[i]).setAttribute('aria-expanded', 'false');
         return;
@@ -633,7 +636,7 @@
       if (idx) idx.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(pns.length).padStart(2, '0');
       if (name) name.textContent = $('.pn__vt', pns[i]).textContent;
       serp(pns[i]);
-      if (!desktop()) setTimeout(refresh, 850);
+      if (!wide()) setTimeout(refresh, 850);
     };
 
     pns.forEach((p, i) => {
@@ -647,7 +650,7 @@
         open(n, true); $('.pn__sp', pns[n]).focus();
       });
       p.addEventListener('pointermove', (e) => {
-        if (!fine || !desktop() || (!e.movementX && !e.movementY)) return;
+        if (!fine || !wide() || (!e.movementX && !e.movementY)) return;
         pauseUntil = performance.now() + 4000;
         if (i === cur) { clearTimeout(hoverT); return; }
         clearTimeout(hoverT);
@@ -664,7 +667,7 @@
     new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) serp(pns[cur]); }, { threshold: 0.4 }).observe(acc);
     if (motion) {
       setInterval(() => {
-        if (!visible || !desktop() || document.hidden || performance.now() < pauseUntil || acc.matches(':hover')) return;
+        if (!visible || !wide() || document.hidden || performance.now() < pauseUntil || acc.matches(':hover')) return;
         open((cur + 1) % pns.length);
       }, 4800);
     }
