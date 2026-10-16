@@ -410,7 +410,17 @@
     const out = $('[data-radar-out]');
     const blips = $$('.blip', radar).map((el) => ({ el, a: Number(el.dataset.angle), label: el.dataset.label, t: -1e9 }));
     if (!motion) { blips.forEach((b) => b.el.classList.add('is-hit')); return; }
-    // Only the latest blip shows its badge, so two badges never stack.
+    // Only the latest blip shows its badge, so two badges never stack. The badge sits
+    // above its dot unless that would cover another client's name; then it drops below.
+    const overlaps = (a, c) => a.left < c.right && c.left < a.right && a.top < c.bottom && c.top < a.bottom;
+    const place = (b) => {
+      const bdg = $('.blip__bdg', b.el);
+      const p = b.el.getBoundingClientRect();
+      const w = bdg.offsetWidth, h = bdg.offsetHeight;
+      const left = b.el.classList.contains('is-l') ? p.left + 14 - w : p.left - 14;
+      const up = { left, right: left + w, top: p.top - 16 - h, bottom: p.top - 16 };
+      b.el.classList.toggle('is-dn', blips.some((o) => o !== b && overlaps(up, $('.blip__nm', o.el).getBoundingClientRect())));
+    };
     let a = null, prev = 0, clock = 0, last = 0;
     whileVisible(radar, (ts) => {
       const dt = last ? Math.min(0.05, (ts - last) / 1000) : 0;
@@ -428,6 +438,7 @@
         if (hit) {
           b.t = ts;
           if (out) out.textContent = b.label;
+          place(b);
           blips.forEach((o) => o.el.classList.toggle('is-top', o === b));
         }
         b.el.classList.toggle('is-hit', ts - b.t < 1600);
@@ -1147,7 +1158,11 @@
     const st = { pos: 0, spread: motion ? 0 : 1, sy: 0, tx: 0, ty: 0 };
     let active = 0, visible = false, sound = false, drag = null, raf = 0;
 
-    const render = () => {
+    let lastKey = '';
+    const render = (force) => {
+      const key = [st.pos, st.spread, st.sy, st.tx, st.ty, small.matches].join();
+      if (force !== true && key === lastKey) return;
+      lastKey = key;
       const w = cards[0].offsetWidth || 260;
       const m = small.matches, k = m ? 0.6 : 0.8;
       const vm = Math.min(2.4, N / 2 - 0.05);
@@ -1301,8 +1316,8 @@
       visible = e.isIntersecting && motion;
       if (visible) play(); else stop();
     }, { threshold: 0.4 }).observe(stage);
-    small.addEventListener('change', render);
-    window.addEventListener('resize', render);
+    small.addEventListener('change', () => render(true));
+    window.addEventListener('resize', () => render(true));
     setActive(0);
     render();
   }
