@@ -17,7 +17,7 @@ require __DIR__ . '/includes/header.php';
 <main id="main">
 
   <!-- ============ HERO ============ -->
-  <section class="hero" data-hero>
+  <section class="hero theme-dark" data-hero>
     <canvas class="hero__crowd" data-crowd aria-hidden="true"></canvas>
     <div class="hero__shade" aria-hidden="true"></div>
     <p class="hero__hint mono" aria-hidden="true"><span class="dot"></span>Move to scan the crowd · click to launch a campaign</p>
@@ -27,7 +27,7 @@ require __DIR__ . '/includes/header.php';
       <p class="badge" data-hero-item><span class="dot dot--live"></span>Taking new projects in 9 markets</p>
       <h1 class="hero__title">
         <span class="line"><span class="line__inner">Scaling ideas.</span></span>
-        <span class="line"><span class="line__inner">Building <mark class="hl">growth.</mark></span></span>
+        <span class="line"><span class="line__inner">Building growth.</span></span>
       </h1>
       <p class="hero__lead" data-hero-item>Webincline is a digital marketing agency in Chandigarh. We run SEO, paid ads, social media, websites, CRM and AI automation that put your brand in front of people ready to buy — and we report every result in plain numbers.</p>
       <div class="hero__actions" data-hero-item>
@@ -51,11 +51,11 @@ require __DIR__ . '/includes/header.php';
   </section>
 
   <!-- ============ CLIENTS RADAR ============ -->
-  <section class="section radar-sec" id="clients">
+  <section class="section radar-sec theme-light" id="clients">
     <div class="container radar-sec__grid">
       <div class="radar-sec__text">
         <p class="tag" data-reveal><span class="dot"></span>(00) Clients</p>
-        <h2 class="h2" data-reveal>500+ brands. <mark class="hl">Nine markets.</mark></h2>
+        <h2 class="h2" data-reveal>500+ brands. Nine markets.</h2>
         <p class="lead" data-reveal>Clinics and colleges in Chandigarh, renovation firms in Dubai, robotics stores in Australia, service companies in Canada and the USA. Each came to us to be found by more of the right people.</p>
         <div class="radar-sec__meta mono" data-reveal>
           <p>8+ years · 21 brands below</p>
@@ -104,12 +104,12 @@ require __DIR__ . '/includes/header.php';
   </section>
 
   <!-- ============ WHY / CROWD ============ -->
-  <section class="section why" id="why">
+  <section class="section why theme-grey" id="why">
     <div class="container">
       <div class="head">
         <div>
           <p class="tag" data-reveal><span class="dot"></span>(01) Why Webincline</p>
-          <h2 class="h2" data-reveal>Your buyers are already online. <mark class="hl">We find them.</mark></h2>
+          <h2 class="h2" data-reveal>Your buyers are already online. We find them.</h2>
         </div>
         <div class="head__side" data-reveal>
           <p class="lead">Most businesses are not invisible. They are just in front of the wrong people. We find the searches, feeds, lookalike audiences and AI answers where your buyers already spend time — and put you there.</p>
@@ -117,7 +117,7 @@ require __DIR__ . '/includes/header.php';
         </div>
       </div>
 
-      <div class="crowd" data-crowd-panel data-reveal>
+      <div class="crowd theme-dark" data-crowd-panel data-reveal>
         <canvas class="crowd__canvas" data-crowd2 aria-hidden="true"></canvas>
         <p class="crowd__top mono"><span class="dot"></span>Everyone online is a crowd</p>
         <?php foreach ($crowd_clusters as $c): ?>
@@ -132,12 +132,12 @@ require __DIR__ . '/includes/header.php';
   </section>
 
   <!-- ============ SERVICES / CHANNELS ============ -->
-  <section class="section services" id="services">
+  <section class="section services theme-light" id="services">
     <div class="container">
       <div class="head">
         <div>
           <p class="tag" data-reveal><span class="dot"></span>(02) Services</p>
-          <h2 class="h2" data-reveal>Twelve services. <mark class="hl">One team.</mark></h2>
+          <h2 class="h2" data-reveal>Twelve services. One team.</h2>
         </div>
         <div class="head__side" data-reveal>
           <p class="lead">SEO, ads, social, websites, CRM and AI automation, grouped into six channels and run by one team with one report.</p>
@@ -188,12 +188,12 @@ require __DIR__ . '/includes/header.php';
   </section>
 
   <!-- ============ CASE STUDIES ============ -->
-  <section class="section work" id="work">
+  <section class="section work theme-dark" id="work">
     <div class="container">
       <div class="head">
         <div>
           <p class="tag" data-reveal><span class="dot"></span>(03) Case studies</p>
-          <h2 class="h2" data-reveal>Before and after, <mark class="hl">in numbers.</mark></h2>
+          <h2 class="h2" data-reveal>Before and after, in numbers.</h2>
         </div>
         <div class="head__side" data-reveal>
           <p class="lead">Six clients, four countries, one rule: we show the number that matters to the business, before we started and after.</p>
@@ -253,11 +253,11 @@ require __DIR__ . '/includes/header.php';
   </section>
 
   <!-- ============ PROCESS + FUNNEL ============ -->
-  <section class="section process" id="process" data-process>
+  <section class="section process theme-light" id="process" data-process>
     <div class="container process__grid">
       <div>
         <p class="tag" data-reveal><span class="dot"></span>(04) How we work</p>
-        <h2 class="h2" data-reveal>From first call to <mark class="hl">steady growth.</mark></h2>
+        <h2 class="h2" data-reveal>From first call to steady growth.</h2>
         <p class="lead" data-reveal>Every project runs the same five steps. You see where we are, and what each step adds, in every report.</p>
         <ol class="steps">
           <?php foreach ($process as $i => $s): ?>
@@ -286,17 +286,17 @@ require __DIR__ . '/includes/header.php';
   </section>
 
   <!-- ============ RESULTS DASHBOARD ============ -->
-  <section class="section results" id="results">
+  <section class="section results theme-grad" id="results">
     <div class="container">
       <div class="head">
         <div>
           <p class="tag" data-reveal><span class="dot"></span>(05) Results</p>
-          <h2 class="h2" data-reveal>What the work <mark class="hl">added up to.</mark></h2>
+          <h2 class="h2" data-reveal>What the work added up to.</h2>
         </div>
         <p class="lead head__side" data-reveal>Figures from our published case studies, not averages or projections. Bars show before and after, drawn to scale.</p>
       </div>
 
-      <div class="board" data-board data-reveal>
+      <div class="board theme-dark" data-board data-reveal>
         <div class="board__bar">
           <p class="mono"><span class="dot dot--live"></span>Webincline · case study results</p>
           <div class="board__tabs" role="tablist" aria-label="Result type">
@@ -333,12 +333,12 @@ require __DIR__ . '/includes/header.php';
   </section>
 
   <!-- ============ CLIENT STORIES ============ -->
-  <section class="section stories" id="stories">
+  <section class="section stories theme-dark" id="stories">
     <div class="container">
       <div class="head">
         <div>
           <p class="tag" data-reveal><span class="dot"></span>(06) Client stories</p>
-          <h2 class="h2" data-reveal>Straight from <mark class="hl">our clients.</mark></h2>
+          <h2 class="h2" data-reveal>Straight from our clients.</h2>
         </div>
         <p class="lead head__side" data-reveal>Business owners, on camera, on what changed after working with us. Tap a story to play it with sound.</p>
       </div>
@@ -358,12 +358,12 @@ require __DIR__ . '/includes/header.php';
   </section>
 
   <!-- ============ TEAM ============ -->
-  <section class="section team" id="team">
+  <section class="section team theme-light" id="team">
     <div class="container">
       <div class="head">
         <div>
           <p class="tag" data-reveal><span class="dot"></span>(07) Team</p>
-          <h2 class="h2" data-reveal>One specialist <mark class="hl">per channel.</mark></h2>
+          <h2 class="h2" data-reveal>One specialist per channel.</h2>
         </div>
         <div class="head__side" data-reveal>
           <p class="lead">Every account gets a senior lead for each channel it uses. The people who plan your work are the people who do it.</p>
@@ -387,11 +387,11 @@ require __DIR__ . '/includes/header.php';
   </section>
 
   <!-- ============ FAQ ============ -->
-  <section class="section faq" id="faq">
+  <section class="section faq theme-grey" id="faq">
     <div class="container faq__grid">
       <div class="faq__side">
         <p class="tag" data-reveal><span class="dot"></span>(08) FAQ</p>
-        <h2 class="h2" data-reveal>Good to know <mark class="hl">before we start.</mark></h2>
+        <h2 class="h2" data-reveal>Good to know before we start.</h2>
         <div class="ask" data-reveal>
           <p class="mono"><span class="dot dot--live"></span>Still deciding?</p>
           <h3>Talk it through with us on a call.</h3>
@@ -418,12 +418,12 @@ require __DIR__ . '/includes/header.php';
   </section>
 
   <!-- ============ INSIGHTS ============ -->
-  <section class="section insights" id="insights">
+  <section class="section insights theme-light" id="insights">
     <div class="container">
       <div class="head">
         <div>
           <p class="tag" data-reveal><span class="dot"></span>(09) Insights</p>
-          <h2 class="h2" data-reveal>Notes from <mark class="hl">the work.</mark></h2>
+          <h2 class="h2" data-reveal>Notes from the work.</h2>
         </div>
         <div class="head__side" data-reveal>
           <p class="lead">What we learn running campaigns every week, written up so you can use it too.</p>
@@ -452,12 +452,12 @@ require __DIR__ . '/includes/header.php';
   </section>
 
   <!-- ============ CONTACT ============ -->
-  <section class="contact" id="contact">
+  <section class="contact theme-dark" id="contact">
     <div class="contact__rings" aria-hidden="true"></div>
     <div class="container contact__grid">
       <div>
         <p class="tag" data-reveal><span class="dot"></span>(10) Let’s talk</p>
-        <h2 class="contact__title" data-reveal>Ready to <mark class="hl">grow?</mark></h2>
+        <h2 class="contact__title" data-reveal>Ready to grow?</h2>
         <p class="lead" data-reveal>Tell us about your business. We look at your website, ads and socials and come back with the quickest wins.</p>
 
         <form class="form" action="/contact-submit.php" method="post" novalidate data-contact-form data-reveal>

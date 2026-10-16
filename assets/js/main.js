@@ -44,7 +44,7 @@
     gsap.timeline({ delay })
       .to('.hero__title .line__inner', { y: 0, duration: 1.2, ease: 'expo.out', stagger: 0.12 })
       .to('[data-hero-item]', { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', stagger: 0.09 }, 0.25)
-      .add(odometer, 0.7);
+      .add(odometer, 0.3);
   }
 
   /* ---------- Rolling odometer ---------- */
@@ -56,7 +56,7 @@
     if (!motion) { box.textContent = value; return; }
     box.innerHTML = value.split('').map(() => `<span class="odometer__col">${'0123456789'.split('').map((d) => `<span>${d}</span>`).join('')}</span>`).join('');
     $$('.odometer__col', box).forEach((col, i) => {
-      gsap.fromTo(col, { yPercent: 0 }, { yPercent: -10 * Number(value[i]), duration: 1.6 + i * 0.25, ease: 'power3.inOut' });
+      gsap.fromTo(col, { yPercent: 0 }, { yPercent: -10 * Number(value[i]), duration: 1 + i * 0.15, ease: 'power3.out' });
     });
   }
 
@@ -241,7 +241,7 @@
           d.el.classList.add('is-ping');
           if (last) last.textContent = d.label;
           clearTimeout(d.timer);
-          d.timer = setTimeout(() => d.el.classList.remove('is-ping'), 2600);
+          d.timer = setTimeout(() => d.el.classList.remove('is-ping'), 1800);
         }
       }
       prev = a;

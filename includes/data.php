@@ -73,16 +73,16 @@ $channels = [
 
 /* Clients on the radar: ring = how far the campaign reached. */
 $radar = [
-    ['name' => 'VIEC',             'metric' => '50× leads',             'ring' => 'local',    'angle' => 30],
-    ['name' => 'Beauty Basket',    'metric' => '60× ROAS',              'ring' => 'national', 'angle' => 115],
-    ['name' => 'RSK Fragrance',    'metric' => '52 top-10 keywords',    'ring' => 'national', 'angle' => 250],
-    ['name' => 'Yalla Renovation', 'metric' => '28 top-10 keywords',    'ring' => 'global',   'angle' => 75],
-    ['name' => 'Moebot',           'metric' => '4× organic traffic',    'ring' => 'global',   'angle' => 160],
-    ['name' => 'Under Pressure',   'metric' => '59 → 3,570 visits/mo',  'ring' => 'global',   'angle' => 205],
-    ['name' => 'Indogulf BioAg',   'metric' => '652 conversions',       'ring' => 'global',   'angle' => 300],
-    ['name' => 'TV Repair Co.',    'metric' => '0 → 762 visits/mo',     'ring' => 'regional', 'angle' => 340],
-    ['name' => 'Robot My Life',    'metric' => '20× organic traffic',   'ring' => 'regional', 'angle' => 185],
-    ['name' => 'Juvly Aesthetics', 'metric' => '75 top-10 keywords',    'ring' => 'regional', 'angle' => 60],
+    ['name' => 'VIEC',             'metric' => '50× leads',             'ring' => 'local',    'angle' => 205],
+    ['name' => 'Beauty Basket',    'metric' => '60× ROAS',              'ring' => 'national', 'angle' => 140],
+    ['name' => 'RSK Fragrance',    'metric' => '52 top-10 keywords',    'ring' => 'national', 'angle' => 295],
+    ['name' => 'Yalla Renovation', 'metric' => '28 top-10 keywords',    'ring' => 'global',   'angle' => 55],
+    ['name' => 'Moebot',           'metric' => '4× organic traffic',    'ring' => 'global',   'angle' => 172],
+    ['name' => 'Under Pressure',   'metric' => '59 → 3,570 visits/mo',  'ring' => 'global',   'angle' => 262],
+    ['name' => 'Indogulf BioAg',   'metric' => '652 conversions',       'ring' => 'global',   'angle' => 328],
+    ['name' => 'TV Repair Co.',    'metric' => '0 → 762 visits/mo',     'ring' => 'regional', 'angle' => 10],
+    ['name' => 'Robot My Life',    'metric' => '20× organic traffic',   'ring' => 'regional', 'angle' => 232],
+    ['name' => 'Juvly Aesthetics', 'metric' => '75 top-10 keywords',    'ring' => 'regional', 'angle' => 100],
 ];
 
 $clients = [
