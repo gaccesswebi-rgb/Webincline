@@ -5,15 +5,15 @@ $page_description = $page_description ?? 'Webincline is a digital marketing agen
 $canonical        = SITE_URL . strtok($_SERVER['REQUEST_URI'] ?? '/', '?');
 
 $org_schema = [
-    '@context' => 'https://schema.org',
-    '@type'    => 'ProfessionalService',
-    'name'     => SITE_NAME,
-    'slogan'   => SITE_TAGLINE,
-    'url'      => SITE_URL,
-    'logo'     => SITE_URL . '/assets/img/brand/icon-512.png',
-    'email'    => $site['email'],
-    'telephone' => array_column($site['phones'], 'tel'),
-    'address'  => [
+    '@context'   => 'https://schema.org',
+    '@type'      => 'ProfessionalService',
+    'name'       => SITE_NAME,
+    'slogan'     => SITE_TAGLINE,
+    'url'        => SITE_URL,
+    'logo'       => SITE_URL . '/assets/img/brand/icon-512.png',
+    'email'      => $site['email'],
+    'telephone'  => array_column($site['phones'], 'tel'),
+    'address'    => [
         '@type'           => 'PostalAddress',
         'streetAddress'   => $site['address']['line1'],
         'addressLocality' => $site['address']['city'],
@@ -30,7 +30,7 @@ $org_schema = [
 <title><?= e($page_title) ?></title>
 <meta name="description" content="<?= e($page_description) ?>">
 <link rel="canonical" href="<?= e($canonical) ?>">
-<meta name="theme-color" content="#120814">
+<meta name="theme-color" content="#050507">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="<?= e(SITE_NAME) ?>">
@@ -45,7 +45,7 @@ $org_schema = [
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Poppins:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="<?= asset('css/main.css') ?>">
 
 <script>
@@ -54,7 +54,7 @@ $org_schema = [
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) root.classList.add('motion');
     try { if (sessionStorage.getItem('wi-intro')) root.classList.add('intro-seen'); } catch (e) {}
     // If the animation scripts never start, show everything anyway.
-    setTimeout(function () { if (!window.wiReady) root.classList.remove('motion'), root.classList.add('intro-seen'); }, 4000);
+    setTimeout(function () { if (!window.wiReady) { root.classList.remove('motion'); root.classList.add('intro-seen'); } }, 4000);
   })(document.documentElement);
 </script>
 <script type="application/ld+json"><?= json_encode($org_schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?></script>
@@ -63,21 +63,18 @@ $org_schema = [
 <a class="skip-link" href="#main">Skip to content</a>
 
 <div class="intro" aria-hidden="true">
-  <div class="intro__blob intro__blob--orange"></div>
-  <div class="intro__blob intro__blob--violet"></div>
   <div class="intro__inner">
-    <img class="intro__logo" src="<?= asset('img/brand/webincline-icon.webp') ?>" alt="" width="160" height="85">
-    <p class="intro__tagline"><?= e(SITE_TAGLINE) ?></p>
-    <div class="intro__bar"><span></span></div>
+    <img class="intro__logo" src="<?= asset('img/brand/webincline-icon.webp') ?>" alt="" width="120" height="64">
+    <p class="intro__count"><span data-intro-count>0</span><small>%</small></p>
+    <p class="intro__label"><?= e(SITE_TAGLINE) ?></p>
   </div>
+  <p class="intro__skip">Click or press Esc to skip</p>
 </div>
 
-<div class="site-bg" aria-hidden="true"></div>
-
 <header class="site-header" data-header>
-  <div class="container site-header__inner">
+  <div class="site-header__inner">
     <a class="brand" href="/" aria-label="<?= e(SITE_NAME) ?> home">
-      <img class="brand__icon" src="<?= asset('img/brand/webincline-icon.webp') ?>" alt="" width="64" height="34">
+      <img class="brand__icon" src="<?= asset('img/brand/webincline-icon.webp') ?>" alt="" width="52" height="28">
       <span class="brand__word">webincline</span>
     </a>
 
@@ -90,7 +87,7 @@ $org_schema = [
     </nav>
 
     <a class="btn btn--primary btn--sm site-header__cta" href="#contact">
-      <span>Let’s talk</span><?= icon('arrow') ?>
+      <span>Book a call</span><span class="btn__icon"><?= icon('arrow-up') ?></span>
     </a>
 
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
@@ -107,8 +104,8 @@ $org_schema = [
       <li><a href="#contact">Contact</a></li>
     </ul>
     <div class="mobile-menu__contact">
-      <a href="mailto:<?= e($site['email']) ?>"><?= e($site['email']) ?></a>
-      <a href="tel:<?= e($site['phones'][0]['tel']) ?>"><?= e($site['phones'][0]['label']) ?></a>
+      <span><?= e($site['email']) ?></span>
+      <span><?= e($site['phones'][0]['label']) ?></span>
     </div>
   </div>
 </header>

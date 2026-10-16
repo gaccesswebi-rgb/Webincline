@@ -42,6 +42,11 @@ function icon(string $name, string $class = 'icon'): string
 {
     $paths = [
         'arrow'     => '<path d="M5 12h14M13 6l6 6-6 6"/>',
+        'search'    => '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/>',
+        'heart'     => '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+        'chat'      => '<path d="M5 18.5V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8z"/>',
+        'send'      => '<path d="m4 12 16-8-6 16-2.5-6.5z"/>',
+        'clock'     => '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
         'arrow-up'  => '<path d="M7 17 17 7M8 7h9v9"/>',
         'plus'      => '<path d="M12 5v14M5 12h14"/>',
         'check'     => '<path d="m5 12 5 5 9-10"/>',
