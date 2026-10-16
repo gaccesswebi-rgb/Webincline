@@ -51,7 +51,7 @@ $org_schema = [
 
 <script>
   (function (root) {
-    root.classList.replace('no-js', 'js');
+    root.classList.remove('no-js'); root.classList.add('js');
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) root.classList.add('motion');
     try { if (sessionStorage.getItem('wi-intro')) root.classList.add('intro-seen'); } catch (e) {}
     // If the animation scripts never start, show everything anyway.

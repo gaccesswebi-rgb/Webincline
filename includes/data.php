@@ -241,10 +241,31 @@ $wins = [
     'Juvly Aesthetics · 75 keywords in the top 10 · Apr 2017',
 ];
 
+// Video testimonials. Names come from what each client says on camera
+// (transcribed); confirm spellings and the company for testimonial-01 with the client.
 $testimonials = [
-    ['video' => 'testimonial-study-abroad', 'name' => '[Client name]', 'company' => 'Study Abroad Education Services'],
-    ['video' => 'testimonial-01',           'name' => '[Client name]', 'company' => '[Company]'],
-    ['video' => 'testimonial-02',           'name' => '[Client name]', 'company' => '[Company]'],
+    ['video' => 'testimonial-study-abroad', 'name' => 'Shipra Sarkar · Dubai, UAE', 'company' => 'Study Abroad Education Services'],
+    ['video' => 'testimonial-01',           'name' => 'Deepa',                      'company' => 'Yalla Renovation'],
+    ['video' => 'testimonial-02',           'name' => 'Long-time client · in Hindi', 'company' => 'Client story'],
+];
+
+// Lock-screen notifications in "Client stories". The first entry arrives first and
+// ends up in the pile; the last one ends on top. 'quote' entries are the clients'
+// own words from their videos (verbatim, or translated where marked); 'result'
+// entries are figures from our published case studies, not quotes.
+$reviews = [
+    ['type' => 'result', 'name' => 'Under Pressure Power Washing', 'role' => 'Case study · Florida, USA', 'logo' => '', 'chip' => '59 → 3,570 visits/mo',
+     'text' => 'Local SEO for a pressure-washing company: 22 target keywords, service pages and steady link building over twelve months.'],
+    ['type' => 'result', 'name' => 'RSK Fragrance House', 'role' => 'Case study · India', 'logo' => 'rsk-fragrance', 'chip' => '52 top-10 keywords',
+     'text' => 'From 3 referring domains to 2,810, and from no rankings to 52 keywords in Google’s top 10.'],
+    ['type' => 'result', 'name' => 'Robot My Life', 'role' => 'Case study · E-commerce', 'logo' => '', 'chip' => '20× organic traffic',
+     'text' => 'Product and category SEO for robot window cleaners and vacuums: 27 keywords in the top 10 within three months.'],
+    ['type' => 'quote', 'name' => 'Long-time client', 'role' => 'On video · translated from Hindi', 'logo' => '', 'chip' => 'Video review',
+     'text' => 'Taking your services and working with you has been a very good experience for me.'],
+    ['type' => 'quote', 'name' => 'Deepa', 'role' => 'Yalla Renovation', 'logo' => 'yalla-renovation', 'chip' => '252 → 3,242 visits/mo',
+     'text' => 'It’s been a pleasure working with a team that is so creative, reliable, professional and always ready to help.'],
+    ['type' => 'quote', 'name' => 'Shipra Sarkar', 'role' => 'Study Abroad Education Services · Dubai', 'logo' => 'study-abroad-education-services', 'chip' => 'Leads & events',
+     'text' => 'They’ve been always helpful for anything, whether you call it as a lead generation or the events which we run… Whenever we say we need so many footfalls, we have more than what we expect from them.'],
 ];
 
 // Replace with real team members (photo in assets/img/team/<n>.webp).

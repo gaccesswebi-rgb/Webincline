@@ -43,7 +43,8 @@
   let lenis = null;
   function initSmooth() {
     if (motion && window.Lenis) {
-      lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+      lenis = new Lenis({ lerp: 0.1, smoothWheel: true, wheelMultiplier: 1, syncTouch: false, gestureOrientation: 'vertical' });
+      window.__lenis = lenis;
       lenis.on('scroll', ScrollTrigger.update);
       gsap.ticker.add((t) => lenis.raf(t * 1000));
       gsap.ticker.lagSmoothing(0);
@@ -56,7 +57,7 @@
       const target = document.querySelector(id);
       if (!target) return;
       e.preventDefault();
-      if (lenis) lenis.scrollTo(target, { duration: 1.4 });
+      if (lenis) lenis.scrollTo(target, { offset: -20, duration: 1.4 });
       else target.scrollIntoView({ behavior: motion ? 'smooth' : 'auto' });
       history.replaceState(null, '', id);
     });
@@ -224,7 +225,7 @@
     'if(a<1.)return mix(c1,c2,a);if(a<2.)return mix(c2,c3,a-1.);if(a<3.)return mix(c3,c4,a-2.);return mix(c4,c1,a-3.);}',
     'void main(){vec2 fc=vec2(gl_FragCoord.x,uView.y-gl_FragCoord.y);vec2 s=fc/uView;',
     'vec3 col=texture2D(uTex,clamp(cover(s),.001,.999)).rgb;float l=dot(col,vec3(.299,.587,.114));',
-    'vec3 grey=mix(vec3(l)*vec3(.95,.95,1.),vec3(.067),.52);',
+    'vec3 grey=mix(vec3(l)*vec3(.95,.95,1.),vec3(.043),.66);',
     'float reach=0.;float rim=0.;vec3 rc=vec3(0.);',
     'for(int i=0;i<8;i++){vec4 P=uP[i];if(P.w<=0.)continue;float age=uTime-P.z;if(age<0.)continue;',
     'float R=age*uDiag*(.2+.07*P.w);vec2 dv=fc-P.xy;float d=length(dv);float life=2.4+2.6*P.w;',
@@ -233,8 +234,8 @@
     'rc+=brand(atan(dv.y,dv.x)/6.2831+.5+uTime*.06)*r;rim+=r;',
     'reach=max(reach,(1.-smoothstep(R-band*5.,R+band,d))*fade);}',
     'float sp=(1.-smoothstep(uDiag*.035,uDiag*.12,distance(fc,uPtr.xy)))*uPtr.z;reach=max(reach,sp*.85);',
-    'vec3 c=mix(grey,col*.92,reach);c=mix(c,rc/max(rim,.001),clamp(rim,0.,1.)*.78);',
-    'float vg=smoothstep(.45,1.,s.y)*.6+(1.-smoothstep(0.,.2,s.y))*.3;c*=1.-vg;',
+    'vec3 c=mix(grey,col*.58,reach);vec2 q=(s-vec2(.5,.46))*vec2(1.,1.35);c*=1.-.38*(1.-smoothstep(.12,.62,length(q)));c=mix(c,rc/max(rim,.001),clamp(rim,0.,1.)*.85);',
+    'float vg=smoothstep(.55,1.,s.y)*.55+(1.-smoothstep(0.,.22,s.y))*.4;c*=1.-vg;',
     'gl_FragColor=vec4(c,1.);}',
   ].join('\n');
 
@@ -430,65 +431,151 @@
   }
 
   /* ---------------- crowd panel ---------------- */
+  // A grey crowd; as the panel scrolls in, 1 in 12 people leave it and pack
+  // into four rings (search / social / lookalikes / AI), each in its brand colour.
+  // Anchor positions come from CSS (--x / --y on each .crowd__tag) so the labels
+  // and the clusters always line up, on every breakpoint.
   function initCrowd() {
     const panel = $('[data-crowd]');
     const cv = $('[data-crowd-cv]');
     if (!panel || !cv) return;
     const ctx = cv.getContext('2d');
     const ratio = $('[data-crowd-ratio]', panel);
-    const anchors = { search: [0.22, 0.56], social: [0.5, 0.38], ads: [0.78, 0.56], ai: [0.76, 0.2] };
-    const keys = Object.keys(anchors);
-    const cols = [[255, 122, 0], [255, 61, 129], [123, 77, 255], [58, 141, 255]];
-    let W = 0, H = 0, dots = [], gather = motion ? 0 : 1;
+    const total = $('[data-crowd-n]', panel);
+    const tags = $$('[data-cluster]', panel);
+    const COL = { search: '255,122,0', social: '255,61,129', ads: '123,77,255', ai: '58,141,255' };
+    const SHARE = { search: 0.3, social: 0.3, ads: 0.2, ai: 0.2 };
+    const ONE_IN = 12;
+    const ease = (t) => { t = clamp(t); return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+    let W = 1, H = 1, N = 0, unit = 10, groups = [], crowd = [], people = [], G = motion ? 0 : 1, goal = G, mx = -1e4, my = -1e4, lastTxt = '';
 
     const build = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      W = panel.clientWidth; H = panel.clientHeight;
-      cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const n = Math.round(Math.min(1200, (W * H) / 380));
-      dots = Array.from({ length: n }, (_, i) => {
-        const buyer = i % 12 === 0;
-        const k = keys[i % keys.length];
-        const ang = Math.random() * Math.PI * 2, rad = Math.sqrt(Math.random()) * Math.min(W, H) * 0.075;
-        const x = Math.random() * W, y = Math.random() * H;
-        return { x, y, hx: x, hy: y, a: Math.random() * 6.28, s: 0.12 + Math.random() * 0.22, buyer, c: cols[keys.indexOf(k)],
-          gx: anchors[k][0] * W + Math.cos(ang) * rad, gy: anchors[k][1] * H + Math.sin(ang) * rad };
+      W = Math.max(1, panel.clientWidth); H = Math.max(1, panel.clientHeight);
+      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      N = W < 560 ? 600 : W < 1000 ? 900 : 1200;
+      unit = Math.min(W, H) * (W < 560 ? 0.021 : 0.019) + 2.2;
+      let seed = 1207;
+      const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+      // people stand alone or in little groups of 2-4
+      const all = [];
+      while (all.length < N) {
+        const x = rnd(), y = rnd(), k = rnd() < 0.3 ? 2 + Math.floor(rnd() * 3) : 1;
+        for (let i = 0; i < k && all.length < N; i++) {
+          all.push({ hx: clamp(x + (i ? (rnd() - 0.5) * 0.018 : 0), 0.01, 0.99) * W, hy: clamp(y + (i ? (rnd() - 0.5) * 0.03 : 0), 0.02, 0.98) * H, r: 1.25 + rnd() * 0.6, ph: rnd() * 6.283, ox: 0, oy: 0, lit: 0 });
+        }
+      }
+      // every ONE_IN-th person is a buyer; buyers are dealt to the four groups by share
+      groups = tags.map((t) => {
+        const cs = getComputedStyle(t);
+        const key = t.dataset.cluster;
+        return { key, el: t, col: COL[key] || '255,255,255', ax: (parseFloat(cs.getPropertyValue('--x')) || 0.5) * W, ay: (parseFloat(cs.getPropertyValue('--y')) || 0.5) * H, m: [] };
       });
+      const buyers = all.filter((_, i) => i % ONE_IN === 0);
+      let acc = 0;
+      const cuts = groups.map((g) => (acc += SHARE[g.key] || 1 / groups.length));
+      buyers.forEach((b, i) => {
+        const f = (i + 0.5) / buyers.length * acc;
+        const g = groups[cuts.findIndex((c) => f <= c)];
+        b.lag = rnd() * 0.42; b.bend = (rnd() - 0.5) * 0.5; b.j = g.m.length;
+        g.m.push(b);
+      });
+      crowd = all.filter((_, i) => i % ONE_IN !== 0);
+      people = all;
+      if (total) total.textContent = fmt(N);
+      lastTxt = '';
     };
-    const draw = () => {
+
+    const text = () => {
+      const e = ease(G);
+      const n = fmt(N - (N - ONE_IN) * Math.pow(e, 0.6));
+      if (ratio && n !== lastTxt) { ratio.textContent = n; lastTxt = n; }
+      panel.style.setProperty('--o', clamp((G - 0.45) * 3).toFixed(3));
+    };
+
+    const draw = (ts) => {
+      const t = (ts || 0) / 1000;
+      const live = motion ? 1 : 0;
+      if (motion) {
+        const r = panel.getBoundingClientRect(), vh = window.innerHeight;
+        goal = clamp(((vh - r.top) / (vh + r.height) - 0.14) / 0.36);
+        G += (goal - G) * 0.12;
+        if (Math.abs(goal - G) < 5e-4) G = goal;
+      }
+      const e = ease(G), span = Math.min(W, H);
       ctx.clearRect(0, 0, W, H);
-      for (const d of dots) {
-        d.a += (Math.random() - 0.5) * 0.3;
-        d.hx += Math.cos(d.a) * d.s; d.hy += Math.sin(d.a) * d.s;
-        if (d.hx < 0 || d.hx > W) d.a = Math.PI - d.a;
-        if (d.hy < 0 || d.hy > H) d.a = -d.a;
-        const g = d.buyer ? gather : 0;
-        d.x += (d.hx + (d.gx - d.hx) * g - d.x) * 0.06;
-        d.y += (d.hy + (d.gy - d.hy) * g - d.y) * 0.06;
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, d.buyer ? 2.2 : 1.2, 0, 6.283);
-        ctx.fillStyle = d.buyer ? `rgba(${d.c[0]},${d.c[1]},${d.c[2]},${0.45 + gather * 0.55})` : `rgba(190,190,200,${0.32 - gather * 0.12})`;
-        ctx.fill();
+
+      // 1. the crowd: dims and steps back from the rings
+      const greyA = 0.62 - 0.4 * e;
+      ctx.fillStyle = `rgba(225,225,235,${greyA.toFixed(3)})`;
+      ctx.beginPath();
+      const lit = [];
+      for (const d of crowd) {
+        let x = d.hx + Math.sin(t * 0.6 + d.ph) * 1.4 * live, y = d.hy + Math.cos(t * 0.5 + d.ph * 1.3) * 1.2 * live;
+        let best = null, bd = 1e12;
+        for (const g of groups) { const q = (x - g.ax) ** 2 + (y - g.ay) ** 2; if (q < bd) { bd = q; best = g; } }
+        const dist = Math.sqrt(bd) || 1, push = e * Math.max(0, 1 - dist / (span * 0.55)) * span * 0.12;
+        x += (x - best.ax) / dist * push + d.ox; y += (y - best.ay) / dist * push + d.oy;
+        if (d.lit > 0.05) { lit.push(d, x, y); continue; }
+        ctx.moveTo(x + d.r, y); ctx.arc(x, y, d.r, 0, 6.2832);
+      }
+      ctx.fill();
+      for (let i = 0; i < lit.length; i += 3) {
+        const d = lit[i];
+        ctx.fillStyle = `rgba(255,255,255,${Math.min(1, greyA + d.lit * 0.7).toFixed(3)})`;
+        ctx.beginPath(); ctx.arc(lit[i + 1], lit[i + 2], d.r * (1 + d.lit * 0.6), 0, 6.2832); ctx.fill();
+      }
+
+      // 2. a soft ring per group, drawn in once most buyers have arrived
+      const k = ease((G - 0.55) / 0.45);
+      if (k > 0) for (const g of groups) {
+        if (!g.m.length) continue;
+        const rr = unit * Math.sqrt(g.m.length) * 0.5 + 14 + (1 - k) * 30;
+        ctx.beginPath(); ctx.arc(g.ax, g.ay, rr, 0, 6.2832);
+        ctx.fillStyle = `rgba(${g.col},${(0.08 * k).toFixed(3)})`; ctx.fill();
+        ctx.strokeStyle = `rgba(${g.col},${(0.6 * k).toFixed(3)})`; ctx.lineWidth = 1; ctx.stroke();
+      }
+
+      // 3. buyers: each leaves on its own beat, curves in, packs on a sunflower spiral
+      for (const g of groups) for (const b of g.m) {
+        const p = ease((G - b.lag) / 0.58);
+        const sx = b.hx + Math.sin(t * 0.6 + b.ph) * 1.4 * live * (1 - p), sy = b.hy + Math.cos(t * 0.5 + b.ph * 1.3) * 1.2 * live * (1 - p);
+        const a = b.j * 2.39996, rad = unit * 0.5 * Math.sqrt(b.j + 0.5);
+        const tx = g.ax + Math.cos(a) * rad + Math.sin(t * 1.3 + b.ph) * 0.6 * live, ty = g.ay + Math.sin(a) * rad + Math.cos(t * 1.1 + b.ph) * 0.6 * live;
+        const dx = tx - sx, dy = ty - sy, w = Math.sin(p * Math.PI) * b.bend;
+        const x = sx + dx * p - dy * w + b.ox, y = sy + dy * p + dx * w + b.oy, r = b.r * (1 + 0.6 * p) * (1 + b.lit * 0.5);
+        if (p < 0.999) { ctx.fillStyle = `rgba(225,225,235,${(0.62 * (1 - p)).toFixed(3)})`; ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832); ctx.fill(); }
+        if (p > 0.001) {
+          if (p > 0.05 && p < 0.95) { ctx.fillStyle = `rgba(${g.col},${(0.2 * p).toFixed(3)})`; ctx.beginPath(); ctx.arc(x, y, r * 2.6, 0, 6.2832); ctx.fill(); }
+          ctx.fillStyle = `rgba(${g.col},${p.toFixed(3)})`; ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832); ctx.fill();
+        }
+      }
+      text();
+    };
+
+    // pointer: people within 70px step aside and light up
+    const nudge = () => {
+      for (const d of people) {
+        let tx = 0, ty = 0, tl = 0;
+        const free = d.lag === undefined || G <= 0.5;
+        if (free && mx > -1e3) {
+          const dx = d.hx - mx, dy = d.hy - my, q = dx * dx + dy * dy;
+          if (q < 4900) { const dd = Math.sqrt(q) || 1, f = 1 - dd / 70; tx = dx / dd * f * 16; ty = dy / dd * f * 16; tl = f; }
+        }
+        d.ox += (tx - d.ox) * 0.14; d.oy += (ty - d.oy) * 0.14; d.lit += (tl - d.lit) * (tl > d.lit ? 0.3 : 0.05);
       }
     };
+    if (fine && motion) {
+      panel.addEventListener('pointermove', (ev) => { const r = cv.getBoundingClientRect(); mx = ev.clientX - r.left; my = ev.clientY - r.top; });
+      panel.addEventListener('pointerleave', () => { mx = my = -1e4; });
+    }
+
     build();
     let rt;
-    window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(build, 200); });
-    if (motion) {
-      panel.style.setProperty('--o', 0);
-      ScrollTrigger.create({
-        trigger: panel, start: 'top 80%', end: 'center 40%', scrub: true,
-        onUpdate: (s) => {
-          gather = s.progress;
-          if (ratio) ratio.textContent = Math.round(138 - (138 - 12) * s.progress);
-          panel.style.setProperty('--o', s.progress.toFixed(3));
-        },
-      });
-      whileVisible(panel, draw);
-    } else {
-      if (ratio) ratio.textContent = '12';
-      draw();
-    }
+    new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(() => { build(); if (!motion) draw(0); }, 150); }).observe(panel);
+    if (motion) whileVisible(panel, (ts) => { nudge(); draw(ts); });
+    else draw(0);
   }
 
   /* ---------------- services accordion ---------------- */
@@ -584,46 +671,54 @@
   }
 
   /* ---------------- case studies ---------------- */
+  // Scrolling moves the divider from "mostly before" to "mostly after"; the wave
+  // chart grows and the AFTER number counts from the before value to the after value
+  // with it. Changing tab replays the sweep. Dragging takes over until the case
+  // leaves the screen.
   function initWork() {
     const sec = $('[data-wk]');
     if (!sec) return;
     const tabs = $$('.wk__tab', sec);
     const cases = $$('.wk__case', sec);
-    let cur = 0, visible = false, hovering = false, dragging = false;
+    const stage = $('.wk__stage', sec);
+    const FROM = 0.86, TO = 0.14; // share of the frame still showing BEFORE
+    const S = { mode: 'scroll', dv: FROM, man: 0.5, p: 0 };
+    let cur = 0, near = false, visible = false, hovering = false, dragging = false, last = -1;
 
-    const run = () => sec.classList.toggle('is-run', motion && visible && !hovering && !dragging);
-
-    const intro = (c) => {
-      const cmp = $('[data-cmp]', c);
-      const range = $('.cmp__range', cmp);
-      const num = $('[data-count]', cmp);
-      const line = $('.cmp__line', cmp);
-      if (!motion) return;
-      const s = { v: 0.08, l: 1 };
-      gsap.to(s, {
-        v: 0.42, l: 0, duration: 1.4, ease: 'power3.inOut',
-        onUpdate: () => {
-          cmp.style.setProperty('--dv', s.v.toFixed(4));
-          cmp.style.setProperty('--dt', s.v.toFixed(4));
-          range.value = Math.round(s.v * 100);
-          line.style.setProperty('--ld', s.l.toFixed(4));
-        },
-      });
-      if (num) countText(num, 1.6);
+    const parts = cases.map((c) => {
+      const cmp = $('[data-cmp]', c), num = $('.cmp__a b', cmp);
+      return { cmp, num, range: $('.cmp__range', cmp), from: Number(num.dataset.from) || 0, to: Number(num.dataset.count) || 0 };
+    });
+    const paint = (dv, force) => {
+      if (!force && Math.abs(dv - last) < 4e-4) return;
+      last = dv;
+      const e = parts[cur], dt = clamp((FROM - dv) / (FROM - TO));
+      e.cmp.style.setProperty('--dv', dv.toFixed(4));
+      e.cmp.style.setProperty('--dt', dt.toFixed(4));
+      e.range.value = Math.round(dv * 100);
+      e.num.textContent = fmt(e.from + (e.to - e.from) * dt);
     };
+    // the 7s auto-advance only runs once the sweep has been seen
+    const run = () => sec.classList.toggle('is-run', motion && visible && !hovering && !dragging && (S.mode !== 'scroll' || S.p > 0.94));
 
     const select = (i, focus) => {
+      if (i === cur) return;
       cur = i;
       tabs.forEach((t, k) => {
         const on = k === i;
         t.setAttribute('aria-selected', String(on));
         t.tabIndex = on ? 0 : -1;
-        const p = $('.wk__prog', t);
-        p.style.animation = 'none'; void p.offsetWidth; p.style.animation = '';
+        const pr = $('.wk__prog', t);
+        pr.style.animation = 'none'; void pr.offsetWidth; pr.style.animation = '';
       });
       cases.forEach((c, k) => { const on = k === i; c.hidden = !on; c.classList.toggle('is-on', on); });
       if (focus) tabs[i].focus();
-      intro(cases[i]);
+      if (!motion) { paint(0.5, true); return; }
+      gsap.killTweensOf(S);
+      S.mode = 'replay';
+      paint(FROM, true);
+      gsap.fromTo(S, { dv: FROM }, { dv: TO, duration: 1.7, ease: 'power2.inOut', onComplete: () => { if (S.mode === 'replay') { S.mode = 'hold'; run(); } } });
+      run();
     };
 
     tabs.forEach((t, i) => {
@@ -635,10 +730,11 @@
       $('.wk__prog', t).addEventListener('animationend', () => { if (i === cur) select((cur + 1) % tabs.length); });
     });
 
-    $$('[data-cmp]', sec).forEach((cmp) => {
-      const range = $('.cmp__range', cmp);
-      const set = (v) => { cmp.style.setProperty('--dv', (v / 100).toFixed(4)); cmp.style.setProperty('--dt', (v / 100).toFixed(4)); };
-      range.addEventListener('input', () => set(range.value));
+    parts.forEach(({ cmp, range }) => {
+      range.addEventListener('input', () => {
+        if (hasGSAP) gsap.killTweensOf(S);
+        S.mode = 'manual'; S.man = range.value / 100; S.dv = S.man; paint(S.dv); run();
+      });
       cmp.addEventListener('pointermove', (e) => {
         const r = cmp.getBoundingClientRect();
         cmp.style.setProperty('--cx', e.clientX - r.left + 'px');
@@ -647,53 +743,216 @@
       cmp.addEventListener('pointerdown', () => { dragging = true; cmp.classList.add('is-drag'); run(); });
       window.addEventListener('pointerup', () => { if (!dragging) return; dragging = false; cmp.classList.remove('is-drag'); run(); });
     });
-
-    const stage = $('.wk__stage', sec);
-    stage.addEventListener('pointerenter', () => { hovering = true; run(); });
+    stage.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') { hovering = true; run(); } });
     stage.addEventListener('pointerleave', () => { hovering = false; run(); });
-    let first = true;
+
+    if (!motion) { paint(0.5, true); return; }
+
+    // The sweep starts when the frame's top reaches 88% of the screen and ends one
+    // "frame height + 18vh" later (at most 76vh).
+    ScrollTrigger.create({
+      trigger: stage,
+      start: 'top 88%',
+      end: () => '+=' + Math.max(80, Math.min(innerHeight * 0.76, innerHeight * 0.18 + parts[cur].cmp.offsetHeight)),
+      onUpdate: (st) => { S.p = st.progress; run(); },
+      invalidateOnRefresh: true,
+    });
     new IntersectionObserver(([e]) => {
-      visible = e.isIntersecting; run();
-      if (visible && first) { first = false; intro(cases[cur]); }
-    }, { threshold: 0.35 }).observe(stage);
+      near = e.isIntersecting;
+      visible = e.intersectionRatio >= 0.35;
+      if (!near && S.mode !== 'scroll') { gsap.killTweensOf(S); S.mode = 'scroll'; }
+      run();
+    }, { threshold: [0, 0.35, 0.6], rootMargin: '10% 0px 10% 0px' }).observe(stage);
+
+    gsap.ticker.add(() => {
+      if (!near && S.mode === 'scroll' && last >= 0) return;
+      if (S.mode === 'scroll') {
+        const goal = FROM + (TO - FROM) * S.p;
+        S.dv += (goal - S.dv) * 0.2;
+        if (Math.abs(goal - S.dv) < 6e-4) S.dv = goal;
+      } else if (S.mode === 'hold') S.dv = TO;
+      else if (S.mode === 'manual') S.dv = S.man;
+      paint(S.dv);
+    });
+    paint(FROM, true);
   }
 
   /* ---------------- process + funnel ---------------- */
+  // Scroll fills the funnel one stage at a time. Particles pour in at the top and
+  // fall through the stages that are open so far; most drop out at each stage, so
+  // Reach is crowded, Clicks thinner, Leads sparse and only a few reach Customers.
   function initFunnel() {
     const sec = $('[data-fn]');
     if (!sec) return;
     const steps = $$('[data-step]', sec);
     const bands = $$('[data-band]', sec);
+    const fun = $('[data-funnel]', sec);
+    const cv = $('[data-fn-cv]', sec);
+    const N = bands.length;
+    const PASS = [0.34, 0.3, 0.36];
+    const inset = bands.map((b) => parseFloat(b.style.getPropertyValue('--a')) / 100);
+    inset.push(parseFloat(bands[N - 1].style.getPropertyValue('--b')) / 100);
+    const ctr = bands.map(() => ({ v: 0, tw: null }));
+    const num = (i) => { $('[data-band-v]', bands[i]).textContent = fmt(ctr[i].v); };
+    let n = 0, act = -2;
+
     const set = (p) => {
-      const act = Math.min(steps.length - 1, Math.floor(p * steps.length * 1.02));
-      steps.forEach((s, i) => { s.classList.toggle('is-act', i === act); s.classList.toggle('is-done', i < act); });
-      bands.forEach((b, i) => {
-        const f = clamp((p * 1.3 - i * 0.24) / 0.3);
-        b.style.setProperty('--f', f.toFixed(3));
-        $('[data-band-v]', b).textContent = fmt(Number(b.dataset.val) * f);
-      });
+      n = clamp((p - 0.04) / 0.86) * N;
+      bands.forEach((b, i) => b.style.setProperty('--f', clamp((n - i) * 1.25).toFixed(4)));
+      const a = n <= 0.02 ? -1 : Math.min(N - 1, Math.floor(n));
+      if (a !== act) {
+        act = a;
+        bands.forEach((b, i) => {
+          const on = i <= a, c = ctr[i];
+          if (on !== b.classList.contains('is-on')) {
+            if (c.tw) c.tw.kill();
+            if (on) c.tw = gsap.to(c, { v: Number(b.dataset.val), duration: 1.4, ease: 'power3.out', onUpdate: () => num(i) });
+            else { c.v = 0; num(i); }
+          }
+          b.classList.toggle('is-on', on);
+          b.classList.toggle('is-act', i === a);
+        });
+      }
+      const sa = n <= 0.02 ? -1 : Math.min(steps.length - 1, Math.floor((n / N) * steps.length));
+      steps.forEach((s, i) => { s.classList.toggle('is-act', i === sa); s.classList.toggle('is-done', i < sa); });
     };
-    if (!motion) { set(1); return; }
+
+    if (!motion) {
+      bands.forEach((b) => { b.classList.add('is-on'); b.style.setProperty('--f', 1); });
+      steps.forEach((s) => s.classList.add('is-done'));
+      if (cv) cv.hidden = true;
+      return;
+    }
+    bands.forEach((b, i) => { ctr[i].v = 0; num(i); });
+
+    // particles
+    const ctx = cv.getContext('2d');
+    let W = 1, H = 1, dpr = 1, rows = [], parts = [], acc = 0, seen = false;
+    const measure = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = fun.clientWidth; H = fun.clientHeight;
+      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+      const r0 = fun.getBoundingClientRect();
+      rows = bands.map((b) => { const r = b.getBoundingClientRect(); return [r.top - r0.top, r.bottom - r0.top]; });
+    };
+    // funnel wall (fraction of the width) at height y
+    const edge = (y) => {
+      for (let i = 0; i < rows.length; i++) {
+        const [t, bt] = rows[i];
+        if (y <= bt) return y < t ? inset[i] : inset[i] + (inset[i + 1] - inset[i]) * ((y - t) / Math.max(1, bt - t));
+      }
+      return inset[rows.length];
+    };
+    const tick = (time, deltaMs) => {
+      if (!seen || !rows.length) return;
+      const dt = Math.min(0.05, deltaMs / 1000);
+      const gate = Math.min(N - 1, Math.floor(Math.max(0, n)));
+      const full = n >= N - 0.02;
+      for (acc += dt * (26 + 30 * clamp(n)); acc > 1; acc--) {
+        parts.push({ u: 0.04 + Math.random() * 0.92, y: rows[0][0] - 6, v: 70 + Math.random() * 60, k: 0, die: 0, r: 1.6 + Math.random() * 1.2, ph: Math.random() * 6.283 });
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      for (let j = parts.length - 1; j >= 0; j--) {
+        const q = parts[j];
+        q.y += q.v * dt * (1 + q.k * 0.25);
+        q.u += Math.sin(time * 2 + q.ph) * 0.054 * dt + (0.5 - q.u) * dt * 0.08 * Math.min(q.k, 3);
+        const row = rows[Math.min(q.k, N - 1)];
+        if (!q.die && q.y > row[1]) {
+          // a particle only moves on into a stage that is already open, and most drop out
+          if (q.k >= (full ? N - 1 : gate)) q.die = 0.001;
+          else if (Math.random() < PASS[q.k]) q.k++;
+          else q.die = 0.001;
+        }
+        if (q.die) q.die += dt * 2.2;
+        if (q.die > 1 || q.y > H + 10) { parts.splice(j, 1); continue; }
+        const e = edge(q.y);
+        const x = W * (e + q.u * (1 - 2 * e));
+        const al = (1 - q.die) * (0.35 + 0.15 * Math.min(3, q.k));
+        ctx.beginPath();
+        if (q.k >= N - 1) {
+          const o = Math.min(1, al + 0.4);
+          ctx.arc(x, q.y, q.r + 1.4, 0, 6.283);
+          ctx.fillStyle = 'rgba(255,61,129,' + o + ')'; ctx.fill();
+          ctx.lineWidth = 1.2; ctx.strokeStyle = 'rgba(255,255,255,' + o * 0.9 + ')'; ctx.stroke();
+        } else {
+          ctx.arc(x, q.y, q.r + q.k * 0.3, 0, 6.283);
+          ctx.fillStyle = 'rgba(17,17,17,' + al + ')'; ctx.fill();
+        }
+      }
+      if (parts.length > 420) parts.splice(0, parts.length - 420);
+    };
+    measure();
+    new ResizeObserver(measure).observe(fun);
+    new IntersectionObserver(([en]) => {
+      seen = en.isIntersecting;
+      if (!seen) { parts = []; ctx.clearRect(0, 0, W, H); }
+    }, { rootMargin: '10% 0px' }).observe(fun);
+    gsap.ticker.add(tick);
+
     gsap.matchMedia()
-      .add('(min-width: 961px)', () => { ScrollTrigger.create({ trigger: sec, start: 'top top', end: 'bottom bottom', onUpdate: (s) => set(s.progress) }); set(0); })
-      .add('(max-width: 960px)', () => { ScrollTrigger.create({ trigger: sec, start: 'top 75%', end: 'bottom 70%', onUpdate: (s) => set(s.progress) }); set(0); });
+      .add('(min-width: 1100px) and (min-height: 680px)', () => {
+        ScrollTrigger.create({ trigger: sec, start: 'top top', end: 'bottom bottom', invalidateOnRefresh: true, onUpdate: (st) => set(st.progress), onRefresh: (st) => { measure(); set(st.progress); } });
+      })
+      .add('(max-width: 1099px), (max-height: 679px)', () => {
+        ScrollTrigger.create({ trigger: fun, start: 'top 85%', end: 'bottom 45%', invalidateOnRefresh: true, onUpdate: (st) => set(st.progress), onRefresh: (st) => { measure(); set(st.progress); } });
+      });
+    set(0);
   }
 
   /* ---------------- results board ---------------- */
+  // Sparklines draw on with scroll (both ways), like the reference. Hovering snaps a
+  // dot to the nearest month; only the two end points carry real numbers.
   function initBoard() {
     const board = $('[data-board]');
     if (!board) return;
+    const sec = board.closest('section') || board;
     const tabs = $$('[data-board-tab]', board);
     const show = (panel) => {
       panel.classList.remove('is-in'); void panel.offsetWidth; panel.classList.add('is-in');
       $$('.tile__v', panel).forEach((v) => countText(v, 1.6));
-      if (motion) $$('.tile__ln', panel).forEach((l) => gsap.fromTo(l, { '--ld': 1 }, { '--ld': 0, duration: 1.6, ease: 'power2.out', delay: 0.2 }));
     };
     tabs.forEach((t) => t.addEventListener('click', () => {
       tabs.forEach((x) => { const on = x === t; x.classList.toggle('is-act', on); x.setAttribute('aria-selected', String(on)); });
-      $$('[data-board-panel]', board).forEach((p) => { p.hidden = p.dataset.boardPanel !== t.dataset.boardTab; if (!p.hidden) show(p); });
+      $$('[data-board-panel]', board).forEach((p) => {
+        p.hidden = p.dataset.boardPanel !== t.dataset.boardTab;
+        if (p.hidden) return;
+        show(p);
+        if (motion) { const o = { v: 0.2 }; gsap.to(o, { v: 1, duration: 1.4, ease: 'power2.out', onUpdate: () => p.style.setProperty('--sp', o.v.toFixed(4)) }); }
+      });
     }));
     inView(board, () => show($('[data-board-panel]:not([hidden])', board)), { threshold: 0.3 });
+
+    if (motion) {
+      // --sp: 0 when the section's top meets the bottom of the screen, 1 when its bottom leaves the top
+      let goal = 0, cur = -1, near = false;
+      ScrollTrigger.create({ trigger: sec, start: 'top bottom', end: 'bottom top', onUpdate: (st) => { goal = st.progress; }, onToggle: (st) => { near = st.isActive; } });
+      gsap.ticker.add(() => {
+        if (!near && cur === goal) return;
+        cur = cur < 0 ? goal : cur + (goal - cur) * 0.18;
+        if (Math.abs(goal - cur) < 5e-4) cur = goal;
+        board.style.setProperty('--sp', cur.toFixed(4));
+      });
+    }
+
+    $$('.tile__sp', board).forEach((sp) => {
+      const vals = JSON.parse(sp.dataset.vals || '[]');
+      const path = $('.tile__ln', sp), svg = $('svg', sp), pt = $('.tile__pt', sp), tt = $('.tile__tt', sp);
+      const tile = sp.closest('.tile');
+      const value = tile ? $('.tile__v', tile).textContent.trim() : '';
+      if (vals.length < 2) return;
+      const ys = (path.getAttribute('d').match(/-?[\d.]+ -?[\d.]+/g) || []).map((q) => Number(q.split(' ')[1]));
+      const n = vals.length;
+      svg.addEventListener('pointermove', (e) => {
+        const r = svg.getBoundingClientRect();
+        const i = clamp(Math.round(((e.clientX - r.left) / r.width) * (n - 1)), 0, n - 1);
+        pt.hidden = tt.hidden = false;
+        pt.style.left = tt.style.left = (i / (n - 1)) * 100 + '%';
+        pt.style.top = tt.style.top = ((ys[i] + 4) / 88) * 100 + '%';
+        tt.textContent = i === 0 ? 'Before · ' + fmt(vals[0]) : i === n - 1 ? 'After · ' + value : 'Month ' + (i + 1);
+      });
+      svg.addEventListener('pointerleave', () => { pt.hidden = tt.hidden = true; });
+    });
   }
 
   /* ---------------- team ---------------- */
@@ -724,49 +983,72 @@
     window.addEventListener('resize', () => focus(cards.findIndex((c) => c.classList.contains('is-lit')), true));
   }
 
-  /* ---------------- client stories phone ---------------- */
-  function initStories() {
-    const phone = $('[data-phone]');
-    if (!phone) return;
-    const vids = $$('[data-story]', phone);
-    const bars = $$('.phone__bars b', phone);
-    const co = $('[data-story-co]', phone);
-    const sndBtn = $('[data-story-sound]', phone);
-    let cur = 0, visible = false, sound = false, raf = 0;
+  /* ---------------- client stories: lock-screen notifications ---------------- */
+  // As the phone scrolls up the screen, reviews arrive one by one on top and push the
+  // older ones down; after three, the oldest fold into a pile. Scrolling back removes them.
+  function initReviews() {
+    const lock = $('[data-reviews]');
+    if (!lock) return;
+    const cards = $$('[data-tn]', lock);
+    const N = cards.length;
+    const nEl = $('[data-lk-n]', lock), lbl = $('[data-lk-label]', lock);
+    const AGO = ['now', '2m ago', '9m ago', '26m ago', '1h ago', '3h ago'];
+    const small = window.matchMedia('(max-width: 809px)');
+    let count = -1, frozen = false;
 
-    const tick = () => {
-      const v = vids[cur];
-      bars.forEach((b, i) => b.style.setProperty('--p', i < cur ? 1 : i > cur ? 0 : (v.duration ? v.currentTime / v.duration : 0)));
-      raf = requestAnimationFrame(tick);
+    const set = (c) => {
+      if (frozen || c === count) return;
+      const grew = c > count;
+      count = c;
+      const step = small.matches ? 158 : 168;
+      cards.forEach((el, i) => {
+        let y = -70, sc = 0.9, op = 0, z = 20, r = -1;
+        if (i < c) {
+          r = c - 1 - i;
+          const k = Math.max(0, r - 2);
+          y = Math.min(r, 2) * step + Math.min(k, 3) * 12;
+          sc = 1 - Math.min(k, 3) * 0.045;
+          op = k > 2 ? 0 : 1 - k * 0.28;
+          z = 20 - r;
+        }
+        el.style.transform = 'translate3d(0,' + y + 'px,0) scale(' + sc.toFixed(3) + ')';
+        el.style.opacity = String(op);
+        el.style.zIndex = String(z);
+        const live = r >= 0 && r <= 2;
+        el.tabIndex = live ? 0 : -1;
+        el.setAttribute('aria-hidden', String(!live));
+        const t = $('[data-tn-t]', el);
+        if (t && r >= 0) t.textContent = AGO[Math.min(r, AGO.length - 1)];
+        if (r === 0 && grew) { el.classList.remove('is-new'); void el.offsetWidth; el.classList.add('is-new'); }
+        else if (r !== 0) el.classList.remove('is-new');
+      });
+      if (nEl) nEl.textContent = String(c);
+      if (lbl) lbl.textContent = c === 1 ? 'New message' : 'New messages';
     };
-    const play = () => {
-      const v = vids[cur];
-      v.muted = !sound;
-      if (v.preload === 'none') { v.preload = 'auto'; v.load(); }
-      const p = v.play();
-      if (p) p.catch(() => {});
-      cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
+
+    // the lock screen shows the time and date in Chandigarh
+    const clock = () => {
+      const now = new Date();
+      const t = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: false }).format(now);
+      const d = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kolkata', weekday: 'long', day: 'numeric', month: 'long' }).format(now).replace(',', '');
+      $$('[data-lk-time], [data-lk-clock]', lock).forEach((el) => { el.textContent = t; });
+      const de = $('[data-lk-date]', lock);
+      if (de) de.textContent = d;
     };
-    const go = (i) => {
-      vids[cur].pause();
-      cur = (i + vids.length) % vids.length;
-      vids.forEach((v, k) => { v.classList.toggle('is-on', k === cur); if (k !== cur) v.currentTime = 0; });
-      if (co) co.textContent = vids[cur].dataset.company || '';
-      if (visible) play();
-    };
-    vids.forEach((v) => v.addEventListener('ended', () => go(cur + 1)));
-    $('[data-story-next]', phone).addEventListener('click', () => go(cur + 1));
-    $('[data-story-prev]', phone).addEventListener('click', () => go(cur - 1));
-    sndBtn.addEventListener('click', () => {
-      sound = !sound;
-      phone.classList.toggle('is-sound', sound);
-      sndBtn.setAttribute('aria-label', sound ? 'Mute' : 'Turn sound on');
-      if (visible) play();
+    clock();
+    setInterval(clock, 30000);
+
+    lock.addEventListener('focusin', () => { frozen = true; });
+    lock.addEventListener('focusout', (e) => { if (!lock.contains(e.relatedTarget)) frozen = false; });
+
+    if (!motion) { set(N); return; }
+    set(0);
+    ScrollTrigger.create({
+      trigger: lock, start: 'top 90%', end: 'top 28%',
+      onUpdate: (st) => set(clamp(Math.floor(st.progress * N + 0.35), 0, N)),
+      onRefresh: (st) => set(clamp(Math.floor(st.progress * N + 0.35), 0, N)),
     });
-    new IntersectionObserver(([e]) => {
-      visible = e.isIntersecting;
-      if (visible) play(); else { vids[cur].pause(); cancelAnimationFrame(raf); }
-    }, { threshold: 0.45 }).observe(phone);
+    small.addEventListener('change', () => { const c = count; count = -1; set(c); });
   }
 
   /* ---------------- video stories: 3D coverflow ---------------- */
@@ -1028,7 +1310,7 @@
   initFunnel();
   initBoard();
   initTeam();
-  initStories();
+  initReviews();
   initVideos();
   initFaq();
   initClocks();

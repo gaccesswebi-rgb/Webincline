@@ -130,9 +130,9 @@ require __DIR__ . '/includes/header.php';
         <canvas class="crowd__cv" data-crowd-cv aria-hidden="true"></canvas>
         <p class="crowd__top mono"><i class="live"></i>Illustration · <b data-crowd-n>1,200</b> people in the crowd</p>
         <?php foreach ($crowd_clusters as $c): ?>
-          <div class="crowd__tag crowd__tag--<?= e($c['key']) ?>" data-cluster="<?= e($c['key']) ?>">
-            <span class="chip mono"><?= e($c['label']) ?></span>
-            <span class="mono"><?= e($c['note']) ?></span>
+          <div class="crowd__tag crowd__tag--<?= e($c['key']) ?><?= in_array($c['key'], ['social', 'ai'], true) ? ' crowd__tag--up' : '' ?>" data-cluster="<?= e($c['key']) ?>">
+            <b class="crowd__chip mono"><?= e($c['label']) ?></b>
+            <span class="crowd__note mono"><?= e($c['note']) ?></span>
           </div>
         <?php endforeach; ?>
         <p class="crowd__big"><span class="crowd__one">1 in</span> <b class="grad" data-crowd-ratio>138</b><span class="crowd__is">is your buyer</span></p>
@@ -216,22 +216,40 @@ require __DIR__ . '/includes/header.php';
         <?php endforeach; ?>
       </div>
 
-      <div class="wk__stage" data-rv>
-        <?php foreach ($case_studies as $i => $c): $m = $c['metric']; $img = asset('img/photos/' . $c['img'] . '.webp'); ?>
+      <div class="wk__stage">
+        <?php foreach ($case_studies as $i => $c):
+          $m = $c['metric'];
+          $img = asset('img/photos/' . $c['img'] . '.webp');
+          // month-by-month shape of the climb (illustrative between the two real numbers)
+          $wd = wave_path(wave_points(wave_values($c['short'], 13), 1000, 276, 40));
+          $rb = wave_rng($c['short'] . '/before');
+          $bl = [];
+          for ($k = 0; $k <= 12; $k++) { $bl[] = [$k / 12 * 1000, 262 + ($k ? ($rb() - .5) * 14 : 0)]; }
+        ?>
           <article class="wk__case<?= $i ? '' : ' is-on' ?>" role="tabpanel" id="wk-case-<?= $i ?>" aria-labelledby="wk-tab-<?= $i ?>" <?= $i ? 'hidden' : '' ?>>
-            <div class="cmp" data-cmp style="--dv:.38">
-              <div class="cmp__after"><img src="<?= $img ?>" alt="<?= e($c['client']) ?>" width="1600" height="1066" loading="lazy"></div>
-              <div class="cmp__before" aria-hidden="true"><img src="<?= $img ?>" alt="" width="1600" height="1066" loading="lazy"></div>
-              <svg class="cmp__line" viewBox="0 0 1000 400" preserveAspectRatio="none" aria-hidden="true">
-                <path d="M0 360 C 160 352, 260 340, 360 318 S 560 250, 660 190 S 860 80, 1000 52" fill="none" pathLength="1"/>
-              </svg>
+            <div class="cmp" data-cmp>
+              <div class="cmp__after">
+                <img src="<?= $img ?>" alt="<?= e($c['client']) ?>" width="1600" height="1066" loading="lazy">
+                <svg class="cmp__ch cmp__ch--a" viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="cmp-ln-<?= $i ?>" x1="0" x2="1"><stop offset="0" stop-color="#FF7A00"/><stop offset=".36" stop-color="#FF3D81"/><stop offset=".7" stop-color="#7B4DFF"/><stop offset="1" stop-color="#3A8DFF"/></linearGradient>
+                    <linearGradient id="cmp-ar-<?= $i ?>" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#FF3D81" stop-opacity=".42"/><stop offset=".55" stop-color="#7B4DFF" stop-opacity=".14"/><stop offset="1" stop-color="#7B4DFF" stop-opacity="0"/></linearGradient>
+                  </defs>
+                  <path class="cmp__ar" d="<?= $wd ?> L1000 300 L0 300Z" fill="url(#cmp-ar-<?= $i ?>)"/>
+                  <path class="cmp__ln" d="<?= $wd ?>" stroke="url(#cmp-ln-<?= $i ?>)"/>
+                </svg>
+                <div class="cmp__a"><span class="chip chip--grad mono"><i class="live"></i>After · <?= e($m['to']) ?></span><b data-count="<?= (int) $m['after'] ?>" data-from="<?= (int) $m['before'] ?>"><?= number_format($m['after']) ?></b></div>
+              </div>
+              <div class="cmp__before">
+                <img src="<?= $img ?>" alt="" width="1600" height="1066" loading="lazy">
+                <svg class="cmp__ch cmp__ch--b" viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true"><path class="cmp__fl" d="<?= wave_line($bl) ?>"/></svg>
+                <div class="cmp__b"><span class="chip mono">Before · <?= e($m['from']) ?></span><b><?= number_format($m['before']) ?></b></div>
+              </div>
               <p class="cmp__chip mono"><i class="live"></i><?= e($c['short']) ?> · <?= e($c['year']) ?></p>
-              <p class="cmp__lbl mono"><?= e($m['label']) ?></p>
-              <div class="cmp__b"><span class="chip mono">Before · <?= e($m['from']) ?></span><b><?= number_format($m['before']) ?></b></div>
-              <div class="cmp__a"><span class="chip chip--grad mono"><i class="live"></i>After · <?= e($m['to']) ?></span><b data-count="<?= (int) $m['after'] ?>"><?= number_format($m['after']) ?></b></div>
+              <p class="cmp__lbl mono"><?= e($m['label']) ?> · trend illustrative</p>
               <span class="cmp__handle" aria-hidden="true"><?= icon('drag') ?></span>
               <span class="cmp__cur mono" aria-hidden="true">Drag</span>
-              <input class="cmp__range" type="range" min="4" max="96" value="38" aria-label="Compare before and after for <?= e($c['client']) ?>">
+              <input class="cmp__range" type="range" min="3" max="97" value="86" aria-label="Compare before and after for <?= e($c['client']) ?>">
             </div>
             <div class="wk__info">
               <div>
@@ -262,7 +280,7 @@ require __DIR__ . '/includes/header.php';
           <p class="lead" data-rv>Every project runs the same five steps. You see where we are, and what each step added, in every report.</p>
           <ol class="steps">
             <?php foreach ($process as $i => $s): ?>
-              <li class="step<?= $i ? '' : ' is-act' ?>" data-step>
+              <li class="step" data-step>
                 <span class="step__n mono"><?= sprintf('%02d', $i + 1) ?></span>
                 <div><h3><?= e($s['title']) ?> <span class="chip mono"><?= e($s['when']) ?></span></h3><p><?= e($s['body']) ?></p></div>
               </li>
@@ -271,18 +289,19 @@ require __DIR__ . '/includes/header.php';
         </div>
 
         <div class="fn__r" data-rv>
-          <div class="funnel">
+          <?php $in = [0, 7, 14, 21, 27]; // funnel wall inset (%) at the top of each band, plus the bottom ?>
+          <div class="funnel" data-funnel>
             <?php foreach ($funnel_demo as $i => $f): ?>
-              <div class="band" style="--i:<?= $i ?>" data-band data-val="<?= (int) $f['value'] ?>">
+              <div class="band" style="--i:<?= $i ?>;--a:<?= $in[$i] ?>%;--b:<?= $in[$i + 1] ?>%" data-band data-val="<?= (int) $f['value'] ?>" tabindex="0">
                 <span class="band__shape"><span class="band__fill"></span></span>
                 <span class="band__in">
                   <span class="chip mono"><b><?= sprintf('%02d', $i + 1) ?></b> <?= e($f['stage']) ?></span>
-                  <b class="band__v" data-band-v>0</b>
+                  <b class="band__v" data-band-v><?= number_format($f['value']) ?></b>
                 </span>
-                <span class="band__tip mono"><?= e($f['note']) ?></span>
+                <span class="band__tip mono"><i class="live"></i><?= e($f['rate']) ?></span>
               </div>
-              <?php if ($i < count($funnel_demo) - 1): ?><p class="band__rate mono"><?= e($f['rate']) ?></p><?php endif; ?>
             <?php endforeach; ?>
+            <canvas class="fn__cv" data-fn-cv aria-hidden="true"></canvas>
           </div>
           <p class="fn__note mono"><i class="live"></i>Example funnel · illustrative numbers</p>
         </div>
@@ -308,20 +327,31 @@ require __DIR__ . '/includes/header.php';
             <button type="button" role="tab" class="is-act" aria-selected="true" data-board-tab="seo">SEO</button>
             <button type="button" role="tab" aria-selected="false" data-board-tab="ads">Paid ads</button>
           </div>
-          <p class="mono board__src">2016 – 2023</p>
+          <p class="mono board__src">2016 – 2023 · curves illustrative</p>
         </div>
         <?php foreach ($dashboard as $key => $tiles): ?>
           <div class="board__grid" data-board-panel="<?= e($key) ?>" <?= $key === 'seo' ? '' : 'hidden' ?>>
-            <?php foreach ($tiles as $i => $t): $max = max($t['bars']); $b0 = $t['bars'][0] / $max; $y0 = round(70 - $b0 * 62, 1); ?>
+            <?php foreach ($tiles as $i => $t):
+              [$from, $to] = $t['bars'];
+              $wv = wave_values($t['client'] . $t['label'], 12, 1.35, .08);
+              $pts = wave_points($wv, 300, 74, 8);
+              $d = wave_line($pts);
+              $vals = array_map(static fn (float $u): float => round($from + $u * ($to - $from), 2), $wv);
+              $gid = 'tl-' . $key . '-' . $i;
+            ?>
               <div class="tile">
                 <p class="mono tile__l"><b><?= sprintf('%02d', $i + 1) ?></b> <?= e($t['label']) ?></p>
                 <p class="tile__v"><?= e($t['value']) ?></p>
                 <span class="chip mono"><i class="live"></i><?= e($t['client']) ?></span>
-                <svg class="tile__sp" viewBox="0 0 200 72" preserveAspectRatio="none" aria-label="Grew from <?= e((string) $t['bars'][0]) ?> to <?= e((string) $t['bars'][1]) ?>">
-                  <path class="tile__area" d="M0 <?= $y0 ?> C 60 <?= $y0 ?>, 90 <?= round($y0 - 10, 1) ?>, 120 34 S 170 12, 200 8 L200 72 L0 72Z"/>
-                  <path class="tile__ln" d="M0 <?= $y0 ?> C 60 <?= $y0 ?>, 90 <?= round($y0 - 10, 1) ?>, 120 34 S 170 12, 200 8" pathLength="1"/>
-                  <circle cx="200" cy="8" r="3.5"/>
-                </svg>
+                <div class="tile__sp" style="--i:<?= $i ?>" data-vals="<?= e(json_encode($vals)) ?>" role="img" aria-label="Grew from <?= e((string) $from) ?> to <?= e((string) $to) ?>">
+                  <svg viewBox="0 -4 300 88" preserveAspectRatio="none" aria-hidden="true">
+                    <defs><linearGradient id="<?= $gid ?>" x1="0" x2="1"><stop offset="0" stop-color="#FF7A00"/><stop offset=".5" stop-color="#FF3D81"/><stop offset="1" stop-color="#7B4DFF"/></linearGradient></defs>
+                    <path class="tile__area" d="<?= $d ?> L300 84 L0 84Z"/>
+                    <path class="tile__ln" d="<?= $d ?>" style="stroke:url(#<?= $gid ?>)"/>
+                  </svg>
+                  <i class="tile__end" style="left:100%;top:<?= round((end($pts)[1] + 4) / 88 * 100, 2) ?>%"></i>
+                  <i class="tile__pt" hidden></i><span class="tile__tt mono" hidden></span>
+                </div>
                 <p class="mono tile__ax"><span>Before</span><span>After</span></p>
               </div>
             <?php endforeach; ?>
@@ -404,29 +434,43 @@ require __DIR__ . '/includes/header.php';
   <!-- ===================== CLIENT STORIES ===================== -->
   <section class="sec sec-light rv" id="stories" data-stories>
     <div class="wrap">
-      <div class="rv__box" data-rv>
+      <div class="rv__box">
         <div class="rv__l">
-          <p class="eb"><i></i>Client stories</p>
-          <p class="rv__big">500<span>+</span></p>
-          <p class="mono rv__sub">Clients since we started · some for 6+ years</p>
-          <h2 class="h2" data-hd><?= title('Clients who|*stay.*') ?></h2>
-          <p class="lead">Business owners, on camera, on what changed after working with us. Tap the phone to hear them.</p>
-          <a class="btn btn--line" href="#work" data-mag><span class="btn__lb">Read case studies</span><span class="btn__ic"><?= icon('arrow-up') ?></span></a>
-        </div>
-        <div class="phone" data-phone>
-          <div class="phone__scr">
-            <div class="phone__bars" aria-hidden="true"><?php foreach ($testimonials as $t): ?><i><b></b></i><?php endforeach; ?></div>
-            <?php foreach ($testimonials as $i => $t): ?>
-              <video class="phone__v<?= $i ? '' : ' is-on' ?>" muted playsinline preload="none" poster="<?= asset('video/' . $t['video'] . '.jpg') ?>" data-story data-company="<?= e($t['company']) ?>">
-                <source src="<?= asset('video/' . $t['video'] . '.mp4') ?>" type="video/mp4">
-              </video>
-            <?php endforeach; ?>
-            <div class="phone__top"><span class="phone__av"><img src="<?= asset('img/brand/webincline-icon.webp') ?>" alt="" width="40" height="22"></span><span><b>Client story</b><small class="mono" data-story-co><?= e($testimonials[0]['company']) ?></small></span></div>
-            <button class="phone__nav phone__nav--p" type="button" aria-label="Previous story" data-story-prev></button>
-            <button class="phone__nav phone__nav--n" type="button" aria-label="Next story" data-story-next></button>
-            <button class="phone__snd" type="button" aria-label="Turn sound on" data-story-sound><?= icon('mute', 'icon icon--m') ?><?= icon('sound', 'icon icon--s') ?></button>
-            <p class="phone__hint mono">Tap for sound</p>
+          <p class="eb" data-rv><i></i>Client stories</p>
+          <div class="rv__score" data-rv style="--d:120ms">
+            <p class="rv__big">500<span>+</span></p>
+            <p class="mono rv__sub">Clients since we started<br>in 9 markets</p>
           </div>
+          <h2 class="h2" data-hd><?= title('Clients who|*stay.*') ?></h2>
+          <p class="lead" data-rv style="--d:480ms">What our clients say about working with us, in their own words, next to the results from their case studies.</p>
+          <a class="btn btn--line" href="#work" data-mag data-rv style="--d:560ms"><span class="btn__lb">Read case studies</span><span class="btn__ic"><?= icon('arrow-up') ?></span></a>
+        </div>
+
+        <div class="lk" data-reviews data-rv style="--d:200ms;--ty:40px">
+          <span class="lk__rings" aria-hidden="true"><i></i><i></i><i></i></span>
+          <div class="lk__status mono" aria-hidden="true"><span data-lk-time>09:41</span><span class="lk__island"></span><span class="lk__bat"><i></i></span></div>
+          <div class="lk__time" aria-hidden="true">
+            <?= icon('lock') ?>
+            <p class="mono" data-lk-date>Monday, 1 January</p>
+            <p class="lk__clock" data-lk-clock>09:41</p>
+          </div>
+          <p class="lk__count mono"><b data-lk-n><?= count($reviews) ?></b> <span data-lk-label>New messages</span></p>
+          <ol class="lk__stack" data-lk-stack>
+            <?php foreach ($reviews as $i => $r): $q = $r['type'] === 'quote'; ?>
+              <li class="tn" data-tn tabindex="0">
+                <p class="tn__app mono"><span class="tn__ic"><img src="<?= asset('img/brand/webincline-icon.webp') ?>" alt="" width="40" height="22" loading="lazy"></span>Webincline<?= $q ? '' : ' · Results' ?><span class="tn__t" data-tn-t>now</span></p>
+                <div class="tn__who">
+                  <span class="tn__av<?= $r['logo'] ? '' : ' tn__av--txt' ?>">
+                    <?php if ($r['logo']): ?><img src="<?= asset('img/clients/' . $r['logo'] . '.webp') ?>" alt="" width="36" height="36" loading="lazy"><?php else: ?><?= e(mb_substr($r['name'], 0, 1)) ?><?php endif; ?>
+                  </span>
+                  <span class="tn__nm"><b><?= e($r['name']) ?></b><small><?= e($r['role']) ?></small></span>
+                  <span class="tn__chip mono"><?= e($r['chip']) ?></span>
+                </div>
+                <p class="tn__q<?= $q ? '' : ' tn__q--res' ?>"><?= $q ? '“' . e($r['text']) . '”' : e($r['text']) ?></p>
+              </li>
+            <?php endforeach; ?>
+          </ol>
+          <div class="lk__foot" aria-hidden="true"><span><?= icon('torch') ?></span><i></i><span><?= icon('camera') ?></span></div>
         </div>
       </div>
     </div>
