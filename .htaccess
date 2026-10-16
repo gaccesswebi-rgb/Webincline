@@ -1,6 +1,11 @@
 # Block direct access to PHP includes and stored leads.
 RedirectMatch 404 ^/(includes|storage)(/|$)
 
+# Caption files for the testimonial videos.
+<IfModule mod_mime.c>
+  AddType text/vtt .vtt
+</IfModule>
+
 # Cache static assets (URLs carry a ?v= version stamp).
 <IfModule mod_expires.c>
   ExpiresActive On

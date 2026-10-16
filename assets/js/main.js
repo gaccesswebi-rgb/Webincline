@@ -997,14 +997,24 @@
     const N = cards.length;
     const nEl = $('[data-lk-n]', lock), lbl = $('[data-lk-label]', lock);
     const AGO = ['now', '2m ago', '9m ago', '26m ago', '1h ago', '3h ago'];
+    const stack = $('[data-lk-stack]', lock);
     const small = window.matchMedia('(max-width: 809px)');
-    let count = -1, frozen = false;
+    let count = -1, want = 0, frozen = false, step = 168;
 
-    const set = (c) => {
-      if (frozen || c === count) return;
+    // every card gets the height of the tallest one, so the stack steps evenly
+    const measure = () => {
+      cards.forEach((el) => { el.style.height = ''; });
+      const h = Math.max(...cards.map((el) => el.offsetHeight));
+      cards.forEach((el) => { el.style.height = h + 'px'; });
+      step = h + (small.matches ? 8 : 18);
+      stack.style.height = step * 2 + 30 + h + 'px';
+    };
+
+    const set = (c, force) => {
+      want = c;
+      if (frozen || (c === count && !force)) return;
       const grew = c > count;
       count = c;
-      const step = small.matches ? 158 : 168;
       cards.forEach((el, i) => {
         let y = -70, sc = 0.9, op = 0, z = 20, r = -1;
         if (i < c) {
@@ -1018,6 +1028,8 @@
         el.style.transform = 'translate3d(0,' + y + 'px,0) scale(' + sc.toFixed(3) + ')';
         el.style.opacity = String(op);
         el.style.zIndex = String(z);
+        el.style.pointerEvents = op === 0 ? 'none' : '';
+        el.inert = op === 0;
         const live = r >= 0 && r <= 2;
         el.tabIndex = live ? 0 : -1;
         el.setAttribute('aria-hidden', String(!live));
@@ -1042,17 +1054,23 @@
     clock();
     setInterval(clock, 30000);
 
-    lock.addEventListener('focusin', () => { frozen = true; });
-    lock.addEventListener('focusout', (e) => { if (!lock.contains(e.relatedTarget)) frozen = false; });
+    // keyboard users can read a card without the stack moving under them
+    lock.addEventListener('focusin', (e) => { if (e.target.matches(':focus-visible')) frozen = true; });
+    lock.addEventListener('focusout', (e) => { if (!lock.contains(e.relatedTarget)) { frozen = false; set(want, true); } });
 
+    measure();
     if (!motion) { set(N); return; }
     set(0);
-    ScrollTrigger.create({
-      trigger: lock, start: 'top 90%', end: 'top 28%',
-      onUpdate: (st) => set(clamp(Math.floor(st.progress * N + 0.35), 0, N)),
-      onRefresh: (st) => set(clamp(Math.floor(st.progress * N + 0.35), 0, N)),
-    });
-    small.addEventListener('change', () => { const c = count; count = -1; set(c); });
+    // measured from the section (the lock itself slides in on reveal, which would skew the start)
+    const sec = lock.closest('section') || lock.parentElement;
+    const at = (pc) => () => 'top+=' + Math.round(lock.offsetTop) + ' ' + pc;
+    const fromScroll = (st) => set(clamp(Math.floor(st.progress * N + 0.35), 0, N));
+    ScrollTrigger.create({ trigger: sec, start: at('90%'), end: at('28%'), invalidateOnRefresh: true, onUpdate: fromScroll, onRefresh: fromScroll });
+    const remeasure = () => { measure(); set(want, true); };
+    small.addEventListener('change', remeasure);
+    let rt = 0;
+    window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(remeasure, 150); });
+    if (document.fonts) document.fonts.ready.then(remeasure);
   }
 
   /* ---------------- video stories: 3D coverflow ---------------- */
@@ -1124,7 +1142,6 @@
       cards.forEach((c, i) => {
         c.classList.toggle('is-on', i === active);
         c.classList.toggle('is-sound', i === active && sound);
-        $('[data-vc-hit]', c).setAttribute('aria-pressed', String(i === active));
       });
       if (idx) idx.textContent = String(active + 1).padStart(2, '0');
       if (visible) play();
@@ -1144,6 +1161,13 @@
     };
 
     $('[data-vs-next]', sec).addEventListener('click', () => go(active + 1));
+    sec.addEventListener('keydown', (e) => {
+      const k = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+      if (!k || !sec.contains(document.activeElement)) return;
+      e.preventDefault();
+      go(active + k);
+      if (document.activeElement.matches('[data-vc-hit]')) $('[data-vc-hit]', cards[active]).focus({ preventScroll: true });
+    });
     $('[data-vs-prev]', sec).addEventListener('click', () => go(active - 1));
     cards.forEach((c, i) => {
       $('[data-vc-hit]', c).addEventListener('click', () => {
@@ -1165,12 +1189,17 @@
     stage.addEventListener('pointerdown', (e) => {
       if (e.button !== 0 || e.target.closest('[data-vc-sound]')) return;
       drag = { x: e.clientX, pos: st.pos, moved: false, id: e.pointerId };
-      gsap.killTweensOf(st, 'pos');
     });
     window.addEventListener('pointermove', (e) => {
       if (!drag || e.pointerId !== drag.id) return;
       const dx = e.clientX - drag.x;
-      if (!drag.moved && Math.abs(dx) > 6) { drag.moved = true; stage.classList.add('is-drag'); }
+      if (!drag.moved && Math.abs(dx) > 6) {
+        // only a real drag interrupts a running slide
+        drag.moved = true;
+        if (motion) gsap.killTweensOf(st, 'pos');
+        drag.pos = st.pos;
+        stage.classList.add('is-drag');
+      }
       if (!drag.moved) return;
       const w = cards[0].offsetWidth * (small.matches ? 0.6 : 0.8);
       st.pos = drag.pos - dx / w;
@@ -1209,8 +1238,9 @@
       gsap.fromTo(st, { sy: 10 }, { sy: -10, ease: 'none', onUpdate: render, scrollTrigger: { trigger: sec, start: 'top bottom', end: 'bottom top', scrub: 1 } });
     }
 
+    // autoplay (muted, with captions) only when motion is allowed; otherwise tap to play
     new IntersectionObserver(([e]) => {
-      visible = e.isIntersecting;
+      visible = e.isIntersecting && motion;
       if (visible) play(); else stop();
     }, { threshold: 0.4 }).observe(stage);
     small.addEventListener('change', render);
