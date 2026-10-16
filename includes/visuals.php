@@ -11,88 +11,101 @@ function channel_visual(string $key): string
     ob_start();
     switch ($key) {
         case 'serp': ?>
-            <div class="mock mock--serp">
-              <div class="mock-search"><?= icon('search') ?><span>robot lawn mower australia</span></div>
-              <div class="mock-ai">
-                <span class="mono">AI overview</span>
-                <p>Top picks for Australian lawns … <b>yourbrand.com.au</b> is frequently recommended for …</p>
+            <div class="ui ui--serp" data-serp>
+              <div class="ui-q"><?= icon('search') ?><span>robot lawn mower australia</span></div>
+              <p class="ui-meta mono">About 2,140,000 results · 0.38 s</p>
+              <div class="ui-res">
+                <?php foreach (['marketplace.com', 'reviews-site.com', 'mowerhub.com.au', 'bigstore.com', 'yourbrand.com.au'] as $i => $site): ?>
+                  <div class="ui-r<?= $i === 4 ? ' is-you' : '' ?>" data-row style="--i:<?= $i ?>">
+                    <span class="ui-fav"></span>
+                    <span class="ui-rt"><b><?= e($site) ?></b><i></i></span>
+                    <?php if ($i === 4): ?><span class="ui-rank mono" data-rank>#5</span><?php endif; ?>
+                  </div>
+                <?php endforeach; ?>
               </div>
-              <ol class="mock-results">
-                <li class="is-you"><span class="mock-rank">#1</span><span><b>yourbrand.com.au</b><i></i></span></li>
-                <li><span class="mock-rank">#2</span><span><b>marketplace.com</b><i></i></span></li>
-                <li><span class="mock-rank">#3</span><span><b>reviews-site.com</b><i></i></span></li>
-              </ol>
+              <p class="ui-toast" data-toast><span class="ui-toast__i"><?= icon('check') ?></span>Cited in AI answers</p>
             </div>
             <?php break;
 
         case 'ads': ?>
-            <div class="mock mock--ads">
-              <div class="mock-ad">
-                <span class="mono">Sponsored · yourbrand.com</span>
-                <p>New season range — free delivery this week</p>
-                <span class="mock-ad__cta">Shop now</span>
+            <div class="ui ui--ads">
+              <div class="ui-ad">
+                <p class="mono">Sponsored · yourbrand.com</p>
+                <p class="ui-ad__h">New season range — free delivery this week</p>
+                <span class="ui-ad__cta">Shop now</span>
+                <span class="ui-ad__glow" aria-hidden="true"></span>
               </div>
-              <div class="mock-gauges">
-                <div class="mock-gauge" style="--p:.82"><b>60×</b><span class="mono">ROAS</span></div>
-                <div class="mock-gauge" style="--p:.64"><b>652</b><span class="mono">Conversions</span></div>
+              <div class="ui-gauges">
+                <div class="ui-g" style="--p:.62"><span class="ui-g__arc"></span><b>4.8%</b><span class="mono">CTR</span></div>
+                <div class="ui-g" style="--p:.86"><span class="ui-g__arc"></span><b>60×</b><span class="mono">ROAS</span></div>
               </div>
-              <div class="mock-bars" aria-hidden="true">
-                <?php foreach ([18, 26, 31, 40, 52, 66, 84] as $i => $h): ?>
-                  <span style="--h:<?= $h ?>%;--d:<?= $i * 0.08 ?>s"<?= $i === 6 ? ' class="is-peak"' : '' ?>></span>
+              <div class="ui-bars" aria-hidden="true">
+                <?php foreach ([22, 30, 34, 46, 55, 70, 92] as $i => $h): ?>
+                  <i style="--h:<?= $h ?>%;--d:<?= $i * 0.08 ?>s"<?= $i === 6 ? ' class="is-peak"' : '' ?>></i>
                 <?php endforeach; ?>
               </div>
+              <p class="ui-toast ui-toast--b"><span class="ui-toast__i"><?= icon('arrow-up') ?></span>Sale · 2 min ago</p>
             </div>
             <?php break;
 
         case 'social': ?>
-            <div class="mock mock--social">
-              <div class="mock-post">
-                <div class="mock-post__head"><span class="mock-avatar">Y</span><span><b>yourbrand</b><small>Sponsored reel</small></span></div>
-                <div class="mock-post__media"><img src="<?= asset('img/brand/webincline-icon.webp') ?>" alt="" loading="lazy" width="120" height="64"><span class="mock-chip mono">Reel · 48s</span></div>
-                <div class="mock-post__foot"><span><?= icon('heart') ?><b>2,418</b></span><span><?= icon('chat') ?><b>136</b></span><span><?= icon('send') ?><b>89</b></span></div>
+            <div class="ui ui--social">
+              <div class="ui-phone">
+                <div class="ui-phone__head"><span class="ui-av"></span><span><b>yourbrand</b><small>Sponsored reel</small></span></div>
+                <div class="ui-phone__media">
+                  <img src="<?= asset('img/photos/feed-12.webp') ?>" alt="" loading="lazy" width="427" height="640">
+                  <span class="ui-hearts" aria-hidden="true"><i></i><i></i><i></i></span>
+                </div>
+                <div class="ui-phone__foot"><span><?= icon('heart') ?><b>2,418</b></span><span><?= icon('chat') ?><b>136</b></span><span><?= icon('send') ?><b>89</b></span></div>
               </div>
-              <div class="mock-float mock-float--a mono">+212 followers</div>
-              <div class="mock-float mock-float--b mono">Creator collab live</div>
+              <p class="ui-toast ui-toast--a"><span class="ui-toast__i">+</span>212 new followers</p>
+              <p class="ui-toast ui-toast--b"><span class="ui-toast__i"><?= icon('check') ?></span>Creator collab live</p>
             </div>
             <?php break;
 
         case 'web': ?>
-            <div class="mock mock--web">
-              <div class="mock-browser">
-                <div class="mock-browser__bar"><i></i><i></i><i></i><span>yourbrand.com</span></div>
-                <div class="mock-browser__body">
+            <div class="ui ui--web">
+              <div class="ui-browser">
+                <div class="ui-browser__bar"><i></i><i></i><i></i><span class="mono">yourbrand.com</span></div>
+                <div class="ui-browser__body">
                   <span class="sk sk--nav"></span>
                   <span class="sk sk--h1"></span>
                   <span class="sk sk--h2"></span>
                   <span class="sk sk--btn">Book a call</span>
+                  <span class="sk sk--img"></span>
                   <div class="sk-row"><span></span><span></span><span></span></div>
                 </div>
               </div>
-              <div class="mock-float mock-float--a mono">✓ Mobile-first</div>
-              <div class="mock-float mock-float--b mono">✓ SEO ready</div>
+              <p class="ui-toast ui-toast--b"><span class="ui-toast__i"><?= icon('arrow-up') ?></span>Enquiries up this month</p>
             </div>
             <?php break;
 
         case 'crm': ?>
-            <div class="mock mock--crm">
-              <?php foreach (['New lead' => 3, 'Contacted' => 2, 'Proposal' => 2, 'Won' => 1] as $col => $n): ?>
-                <div class="mock-col">
-                  <span class="mono"><?= e($col) ?></span>
-                  <?php for ($i = 0; $i < $n; $i++): ?><span class="mock-card"><i></i><i></i></span><?php endfor; ?>
-                </div>
-              <?php endforeach; ?>
-              <span class="mock-card mock-card--moving" aria-hidden="true"><i></i><i></i></span>
+            <div class="ui ui--crm">
+              <div class="ui-crm__head"><span class="mono">Pipeline</span><span class="ui-crm__tools mono">Zoho · HubSpot · GoHighLevel</span></div>
+              <div class="ui-crm__cols">
+                <?php foreach (['New lead' => 3, 'Contacted' => 2, 'Proposal' => 2, 'Won' => 1] as $col => $n): ?>
+                  <div class="ui-col">
+                    <span class="mono"><?= e($col) ?></span>
+                    <?php for ($i = 0; $i < $n; $i++): ?><span class="ui-card"><i></i><i></i></span><?php endfor; ?>
+                  </div>
+                <?php endforeach; ?>
+                <span class="ui-card ui-card--moving" aria-hidden="true"><i></i><i></i></span>
+              </div>
+              <p class="ui-toast ui-toast--b"><span class="ui-toast__i"><?= icon('check') ?></span>Deal won · auto follow-up sent</p>
             </div>
             <?php break;
 
         case 'ai': ?>
-            <div class="mock mock--ai">
-              <div class="mock-chat__head"><span class="mock-avatar">AI</span><span><b>Webincline agent</b><small>online · replies instantly</small></span></div>
-              <div class="mock-msg mock-msg--in">Hi, do you build websites for clinics?</div>
-              <div class="mock-msg mock-msg--out">Yes! Where is your clinic, and what would you like the site to do?</div>
-              <div class="mock-msg mock-msg--in">Toronto. I want more bookings.</div>
-              <div class="mock-msg mock-msg--out">Booked a call for Tue, 4:00 PM. You’ll get a WhatsApp reminder.</div>
-              <div class="mock-typing"><i></i><i></i><i></i></div>
+            <div class="ui ui--ai">
+              <div class="ui-chat">
+                <div class="ui-chat__head"><span class="ui-av ui-av--ai">AI</span><span><b>Webincline agent</b><small>online · replies instantly</small></span></div>
+                <div class="ui-msg ui-msg--in">Hi, do you build websites for clinics?</div>
+                <div class="ui-msg ui-msg--out">Yes! Where is your clinic, and what should the site do?</div>
+                <div class="ui-msg ui-msg--in">Toronto. I want more bookings.</div>
+                <div class="ui-msg ui-msg--out">Booked a call for Tue, 4:00 PM. You’ll get a WhatsApp reminder.</div>
+                <div class="ui-typing"><i></i><i></i><i></i></div>
+              </div>
             </div>
             <?php break;
     }

@@ -37,6 +37,19 @@ function csrf_token(): string
     return $_SESSION['csrf'];
 }
 
+/**
+ * Heading markup: "|" starts a new line, *words* get the brand gradient.
+ * Example: title('Six channels.|*One* growth plan.')
+ */
+function title(string $text): string
+{
+    $lines = array_map(static function (string $line): string {
+        $html = preg_replace('/\*(.+?)\*/', '<span class="grad">$1</span>', e(trim($line)));
+        return '<span class="ln"><span class="ln__in">' . $html . '</span></span>';
+    }, explode('|', $text));
+    return implode(' ', $lines);
+}
+
 /** Small inline SVG icon set. */
 function icon(string $name, string $class = 'icon'): string
 {
@@ -46,6 +59,11 @@ function icon(string $name, string $class = 'icon'): string
         'heart'     => '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
         'chat'      => '<path d="M5 18.5V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8z"/>',
         'send'      => '<path d="m4 12 16-8-6 16-2.5-6.5z"/>',
+        'calendar'  => '<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/>',
+        'drag'      => '<path d="M9 6 3 12l6 6M15 6l6 6-6 6"/>',
+        'sound'     => '<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/>',
+        'mute'      => '<path d="M4 9v6h4l5 4V5L8 9z"/><path d="m17 9 5 6M22 9l-5 6"/>',
+        'star'      => '<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z" fill="currentColor" stroke="none"/>',
         'clock'     => '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
         'arrow-up'  => '<path d="M7 17 17 7M8 7h9v9"/>',
         'plus'      => '<path d="M12 5v14M5 12h14"/>',

@@ -11,6 +11,7 @@ declare(strict_types=1);
 $channels = [
     [
         'slug'     => 'seo',
+        'theme'    => 'fog',
         'title'    => 'SEO & AI search',
         'short'    => 'SEO',
         'line'     => 'Rank where your buyers search.',
@@ -21,6 +22,7 @@ $channels = [
     ],
     [
         'slug'     => 'paid-ads',
+        'theme'    => 'ink',
         'title'    => 'Paid ads',
         'short'    => 'Ads',
         'line'     => 'Spend that comes back as sales.',
@@ -31,6 +33,7 @@ $channels = [
     ],
     [
         'slug'     => 'social-media',
+        'theme'    => 'cloud',
         'title'    => 'Social & influencers',
         'short'    => 'Social',
         'line'     => 'Feeds people actually stop on.',
@@ -41,6 +44,7 @@ $channels = [
     ],
     [
         'slug'     => 'web-development',
+        'theme'    => 'orange',
         'title'    => 'Websites & stores',
         'short'    => 'Web',
         'line'     => 'Sites that turn visits into enquiries.',
@@ -51,6 +55,7 @@ $channels = [
     ],
     [
         'slug'     => 'crm',
+        'theme'    => 'violet',
         'title'    => 'CRM',
         'short'    => 'CRM',
         'line'     => 'Every lead in one pipeline.',
@@ -61,6 +66,7 @@ $channels = [
     ],
     [
         'slug'     => 'ai-automation',
+        'theme'    => 'pink',
         'title'    => 'Automation & AI',
         'short'    => 'AI',
         'line'     => 'Replies in seconds, day and night.',
@@ -73,16 +79,16 @@ $channels = [
 
 /* Clients on the radar: ring = how far the campaign reached. */
 $radar = [
-    ['name' => 'VIEC',             'metric' => '50× leads',             'ring' => 'local',    'angle' => 205],
-    ['name' => 'Beauty Basket',    'metric' => '60× ROAS',              'ring' => 'national', 'angle' => 140],
+    ['name' => 'VIEC',             'metric' => '50× leads',             'ring' => 'local',    'angle' => 160],
+    ['name' => 'Beauty Basket',    'metric' => '60× ROAS',              'ring' => 'national', 'angle' => 128],
     ['name' => 'RSK Fragrance',    'metric' => '52 top-10 keywords',    'ring' => 'national', 'angle' => 295],
-    ['name' => 'Yalla Renovation', 'metric' => '28 top-10 keywords',    'ring' => 'global',   'angle' => 55],
-    ['name' => 'Moebot',           'metric' => '4× organic traffic',    'ring' => 'global',   'angle' => 172],
-    ['name' => 'Under Pressure',   'metric' => '59 → 3,570 visits/mo',  'ring' => 'global',   'angle' => 262],
-    ['name' => 'Indogulf BioAg',   'metric' => '652 conversions',       'ring' => 'global',   'angle' => 328],
-    ['name' => 'TV Repair Co.',    'metric' => '0 → 762 visits/mo',     'ring' => 'regional', 'angle' => 10],
-    ['name' => 'Robot My Life',    'metric' => '20× organic traffic',   'ring' => 'regional', 'angle' => 232],
-    ['name' => 'Juvly Aesthetics', 'metric' => '75 top-10 keywords',    'ring' => 'regional', 'angle' => 100],
+    ['name' => 'Yalla Renovation', 'metric' => '28 top-10 keywords',    'ring' => 'global',   'angle' => 72],
+    ['name' => 'Moebot',           'metric' => '4× organic traffic',    'ring' => 'global',   'angle' => 185],
+    ['name' => 'Under Pressure',   'metric' => '59 → 3,570 visits/mo',  'ring' => 'global',   'angle' => 255],
+    ['name' => 'Indogulf BioAg',   'metric' => '652 conversions',       'ring' => 'global',   'angle' => 330],
+    ['name' => 'TV Repair Co.',    'metric' => '0 → 762 visits/mo',     'ring' => 'regional', 'angle' => 40],
+    ['name' => 'Robot My Life',    'metric' => '20× organic traffic',   'ring' => 'regional', 'angle' => 225],
+    ['name' => 'Juvly Aesthetics', 'metric' => '75 top-10 keywords',    'ring' => 'regional', 'angle' => 105],
 ];
 
 $clients = [
@@ -121,6 +127,7 @@ $case_studies = [
     [
         'client'  => 'Under Pressure Power Washing',
         'short'   => 'Under Pressure',
+        'img'     => 'case-under-pressure',
         'market'  => 'Florida, USA',
         'service' => ['SEO', 'Content'],
         'year'    => '2022 – 2023',
@@ -132,6 +139,7 @@ $case_studies = [
     [
         'client'  => 'Yalla Renovation',
         'short'   => 'Yalla Renovation',
+        'img'     => 'case-yalla',
         'market'  => 'Dubai, UAE',
         'service' => ['SEO'],
         'year'    => '2022 – 2023',
@@ -143,6 +151,7 @@ $case_studies = [
     [
         'client'  => 'Robot My Life',
         'short'   => 'Robot My Life',
+        'img'     => 'case-robot-my-life',
         'market'  => 'E-commerce',
         'service' => ['SEO'],
         'year'    => '2022 – 2023',
@@ -154,6 +163,7 @@ $case_studies = [
     [
         'client'  => 'Moebot',
         'short'   => 'Moebot',
+        'img'     => 'case-moebot',
         'market'  => 'Australia',
         'service' => ['SEO'],
         'year'    => '2022 – 2023',
@@ -165,6 +175,7 @@ $case_studies = [
     [
         'client'  => 'TV Repair Company',
         'short'   => 'TV Repair Co.',
+        'img'     => 'case-tv-repair',
         'market'  => 'Ontario, Canada',
         'service' => ['Local SEO'],
         'year'    => '2021 – 2022',
@@ -176,6 +187,7 @@ $case_studies = [
     [
         'client'  => 'RSK Fragrance House',
         'short'   => 'RSK Fragrance',
+        'img'     => 'case-rsk',
         'market'  => 'India',
         'service' => ['SEO'],
         'year'    => '2021 – 2022',
@@ -263,6 +275,7 @@ $posts = [
         'read'     => '6 min read',
         'excerpt'  => 'Customers now find brands through Reels, Facebook ads, WhatsApp and creators before they buy. Here is how an agency turns that into growth.',
         'path'     => '/post/how-a-social-media-agency-can-help-small-businesses-grow-in-india',
+        'img'      => 'post-social',
     ],
     [
         'title'    => 'Best Digital Marketing Strategy for Small Businesses in 2026',
@@ -271,6 +284,7 @@ $posts = [
         'read'     => '4 min read',
         'excerpt'  => 'SEO, local visibility, social, content and paid ads — combined into a lead engine that keeps working.',
         'path'     => '/post/best-digital-marketing-strategy-for-small-businesses',
+        'img'      => 'post-strategy',
     ],
     [
         'title'    => 'How AI and AEO Are Replacing Traditional SEO',
@@ -279,5 +293,32 @@ $posts = [
         'read'     => '5 min read',
         'excerpt'  => 'People now ask AI assistants instead of scrolling results. What answer-engine optimisation means for your SEO.',
         'path'     => '/post/how-ai-and-answer-engine-optimization-are-replacing-traditional-seo',
+        'img'      => 'post-aeo',
     ],
 ];
+
+/* Content feed: formats we make. Photos are placeholders until real client work is added. */
+$feed = [
+    ['img' => 'feed-1',  'format' => 'Reel',        'niche' => 'Café'],
+    ['img' => 'feed-5',  'format' => 'Carousel',    'niche' => 'Beauty'],
+    ['img' => 'feed-9',  'format' => 'Story',       'niche' => 'Bakery'],
+    ['img' => 'feed-12', 'format' => 'Reel',        'niche' => 'Fashion'],
+    ['img' => 'feed-6',  'format' => 'Product shot', 'niche' => 'Skincare'],
+    ['img' => 'feed-3',  'format' => 'UGC',         'niche' => 'Food'],
+    ['img' => 'feed-8',  'format' => 'Carousel',    'niche' => 'Cosmetics'],
+    ['img' => 'feed-2',  'format' => 'Flat lay',    'niche' => 'Coffee'],
+    ['img' => 'feed-11', 'format' => 'Story',       'niche' => 'Home decor'],
+    ['img' => 'feed-10', 'format' => 'Reel',        'niche' => 'Breakfast'],
+    ['img' => 'feed-7',  'format' => 'Ad creative', 'niche' => 'Skincare'],
+    ['img' => 'case-rsk', 'format' => 'Product shot', 'niche' => 'Fragrance'],
+];
+
+/* Example funnel shown next to the process steps (illustrative numbers). */
+$funnel_demo = [
+    ['stage' => 'Reach',     'value' => 120000, 'note' => 'SEO · Ads · Social', 'rate' => '4% become clicks'],
+    ['stage' => 'Clicks',    'value' => 4800,   'note' => 'Website · Landing pages', 'rate' => '8% become leads'],
+    ['stage' => 'Leads',     'value' => 384,    'note' => 'CRM · AI agents', 'rate' => '15% become customers'],
+    ['stage' => 'Customers', 'value' => 58,     'note' => 'Automation · Follow-ups', 'rate' => 'and they come back'],
+];
+
+$hero_chips = ['New lead', 'Call booked', '#1 on Google', 'New follower', 'WhatsApp enquiry', 'Form filled', 'Top-10 keyword', 'Repeat order', 'Reel shared', '5-star review'];

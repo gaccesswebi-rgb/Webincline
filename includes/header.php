@@ -30,7 +30,7 @@ $org_schema = [
 <title><?= e($page_title) ?></title>
 <meta name="description" content="<?= e($page_description) ?>">
 <link rel="canonical" href="<?= e($canonical) ?>">
-<meta name="theme-color" content="#050507">
+<meta name="theme-color" content="#111111">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="<?= e(SITE_NAME) ?>">
@@ -42,6 +42,7 @@ $org_schema = [
 
 <link rel="icon" type="image/png" sizes="32x32" href="<?= asset('img/brand/favicon-32.png') ?>">
 <link rel="apple-touch-icon" href="<?= asset('img/brand/apple-touch-icon.png') ?>">
+<link rel="preload" as="image" href="<?= asset('img/photos/hero-crowd.webp') ?>">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -63,49 +64,51 @@ $org_schema = [
 <a class="skip-link" href="#main">Skip to content</a>
 
 <div class="intro" aria-hidden="true">
+  <div class="intro__ring"></div>
   <div class="intro__inner">
     <img class="intro__logo" src="<?= asset('img/brand/webincline-icon.webp') ?>" alt="" width="120" height="64">
     <p class="intro__count"><span data-intro-count>0</span><small>%</small></p>
-    <p class="intro__label"><?= e(SITE_TAGLINE) ?></p>
+    <p class="intro__label mono"><?= e(SITE_TAGLINE) ?></p>
   </div>
-  <p class="intro__skip">Click or press Esc to skip</p>
+  <p class="intro__skip mono">Click or press Esc to skip</p>
 </div>
 
-<header class="site-header" data-header>
-  <div class="site-header__inner">
-    <a class="brand" href="/" aria-label="<?= e(SITE_NAME) ?> home">
-      <img class="brand__icon" src="<?= asset('img/brand/webincline-icon.webp') ?>" alt="" width="52" height="28">
-      <span class="brand__word">webincline</span>
+<header class="hd" data-header>
+  <div class="hd__bar">
+    <a class="hd__logo" href="/" aria-label="<?= e(SITE_NAME) ?> home">
+      <img class="hd__mark" src="<?= asset('img/brand/webincline-icon.webp') ?>" alt="" width="46" height="25">
+      <span>webincline</span>
     </a>
 
-    <nav class="site-nav" aria-label="Main">
-      <ul>
+    <nav class="hd__nav" aria-label="Main">
+      <ul class="hd__links">
         <?php foreach ($nav as $item): ?>
           <li><a href="<?= e($item['href']) ?>"><?= e($item['label']) ?></a></li>
         <?php endforeach; ?>
       </ul>
     </nav>
 
-    <a class="btn btn--primary btn--sm site-header__cta" href="#contact">
-      <span>Book a call</span><span class="btn__icon"><?= icon('arrow-up') ?></span>
-    </a>
-
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-      <span class="sr-only">Open menu</span>
-      <?= icon('menu', 'icon icon--open') ?><?= icon('close', 'icon icon--close') ?>
-    </button>
+    <div class="hd__act">
+      <a class="btn btn--solid btn--sm hd__cta" href="#contact" data-mag>
+        <span class="btn__lb">Book a call</span><span class="btn__ic"><?= icon('calendar') ?></span>
+      </a>
+      <button class="hd__menu" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="sr-only">Open menu</span><i></i><i></i>
+      </button>
+    </div>
   </div>
 
-  <div class="mobile-menu" id="mobile-menu" data-mobile-menu hidden>
-    <ul>
-      <?php foreach ($nav as $item): ?>
-        <li><a href="<?= e($item['href']) ?>"><?= e($item['label']) ?></a></li>
+  <div class="mm" id="mobile-menu" data-mobile-menu hidden>
+    <ul class="mm__links">
+      <?php foreach ($nav as $i => $item): ?>
+        <li><a href="<?= e($item['href']) ?>"><span class="mono"><?= sprintf('%02d', $i + 1) ?></span><?= e($item['label']) ?></a></li>
       <?php endforeach; ?>
-      <li><a href="#contact">Contact</a></li>
+      <li><a href="#contact"><span class="mono"><?= sprintf('%02d', count($nav) + 1) ?></span>Contact</a></li>
     </ul>
-    <div class="mobile-menu__contact">
-      <span><?= e($site['email']) ?></span>
-      <span><?= e($site['phones'][0]['label']) ?></span>
+    <div class="mm__foot">
+      <p class="mono">Say hello</p>
+      <p class="selectable"><?= e($site['email']) ?></p>
+      <p><?= e($site['phones'][0]['label']) ?></p>
     </div>
   </div>
 </header>
