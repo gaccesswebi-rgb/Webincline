@@ -769,6 +769,170 @@
     }, { threshold: 0.45 }).observe(phone);
   }
 
+  /* ---------------- video stories: 3D coverflow ---------------- */
+  function initVideos() {
+    const sec = $('[data-vs]');
+    if (!sec) return;
+    const stage = $('[data-vs-stage]', sec);
+    const ring = $('[data-vs-ring]', sec);
+    const cards = $$('[data-vc]', sec);
+    const vids = cards.map((c) => $('video', c));
+    const idx = $('[data-vs-idx]', sec);
+    const N = cards.length;
+    if (!N) return;
+    const small = window.matchMedia('(max-width: 640px)');
+    // pos is a float index: 0 = first card in front. spread fans the cards out on scroll.
+    const st = { pos: 0, spread: motion ? 0 : 1, sy: 0, tx: 0, ty: 0 };
+    let active = 0, visible = false, sound = false, drag = null, raf = 0;
+
+    const render = () => {
+      const w = cards[0].offsetWidth || 260;
+      const m = small.matches, k = m ? 0.6 : 0.8;
+      const vm = Math.min(2.4, N / 2 - 0.05);
+      cards.forEach((c, i) => {
+        let o = ((i - st.pos) % N + N) % N;
+        if (o > N / 2) o -= N;
+        const a = Math.abs(o), sg = Math.sign(o);
+        const x = sg * (Math.min(a, 1) * w * k + Math.max(a - 1, 0) * w * k * 0.55) * st.spread;
+        const z = -a * (m ? 150 : 230) * st.spread - a * 6;
+        const ry = -clamp(o, -2, 2) * (m ? 32 : 28) * st.spread;
+        const sc = 1 - Math.min(a, 2) * 0.05;
+        const op = a <= vm - 0.35 ? 1 : clamp((vm - a) / 0.35);
+        c.style.transform = 'translate3d(' + x.toFixed(1) + 'px,0,' + z.toFixed(1) + 'px) rotateY(' + ry.toFixed(2) + 'deg) scale(' + sc.toFixed(3) + ')';
+        c.style.opacity = op.toFixed(3);
+        c.style.visibility = op < 0.01 ? 'hidden' : '';
+        c.style.zIndex = String(100 - Math.round(a * 10));
+        c.style.setProperty('--dim', (Math.min(a, 1.2) * 0.5).toFixed(3));
+      });
+      ring.style.transform = 'rotateX(' + st.tx.toFixed(2) + 'deg) rotateY(' + (st.ty + st.sy).toFixed(2) + 'deg)';
+    };
+
+    const tick = () => {
+      const v = vids[active];
+      cards[active].style.setProperty('--p', v.duration ? (v.currentTime / v.duration).toFixed(4) : 0);
+      raf = requestAnimationFrame(tick);
+    };
+    const play = () => {
+      const v = vids[active];
+      v.muted = !sound;
+      if (v.preload === 'none') { v.preload = 'auto'; v.load(); }
+      const p = v.play();
+      if (p) p.catch(() => {});
+      cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
+    };
+    const stop = () => { vids[active].pause(); cancelAnimationFrame(raf); };
+    vids.forEach((v, i) => {
+      v.addEventListener('playing', () => cards[i].classList.add('is-playing'));
+      v.addEventListener('pause', () => cards[i].classList.remove('is-playing'));
+      v.addEventListener('ended', () => go(active + 1));
+    });
+
+    const setActive = (n) => {
+      const next = ((n % N) + N) % N;
+      if (next !== active) {
+        stop();
+        vids[active].currentTime = 0;
+        cards[active].style.setProperty('--p', 0);
+      }
+      active = next;
+      cards.forEach((c, i) => {
+        c.classList.toggle('is-on', i === active);
+        c.classList.toggle('is-sound', i === active && sound);
+        $('[data-vc-hit]', c).setAttribute('aria-pressed', String(i === active));
+      });
+      if (idx) idx.textContent = String(active + 1).padStart(2, '0');
+      if (visible) play();
+    };
+    // Move to card n along the shortest way round the loop.
+    const go = (n) => {
+      let target = n;
+      const base = Math.round(st.pos);
+      const want = ((n % N) + N) % N;
+      let d = want - (((base % N) + N) % N);
+      if (d > N / 2) d -= N;
+      if (d < -N / 2) d += N;
+      target = base + d;
+      setActive(want);
+      if (!motion) { st.pos = target; render(); return; }
+      gsap.to(st, { pos: target, duration: 1, ease: 'expo.out', onUpdate: render, overwrite: 'auto' });
+    };
+
+    $('[data-vs-next]', sec).addEventListener('click', () => go(active + 1));
+    $('[data-vs-prev]', sec).addEventListener('click', () => go(active - 1));
+    cards.forEach((c, i) => {
+      $('[data-vc-hit]', c).addEventListener('click', () => {
+        if (drag && drag.moved) return;
+        if (i !== active) { go(i); return; }
+        const v = vids[active];
+        if (v.paused) play(); else if (!sound) toggleSound(); else v.pause();
+      });
+      $('[data-vc-sound]', c).addEventListener('click', () => toggleSound());
+    });
+    const toggleSound = () => {
+      sound = !sound;
+      cards.forEach((c, i) => c.classList.toggle('is-sound', i === active && sound));
+      $$('[data-vc-sound]', sec).forEach((b) => b.setAttribute('aria-label', sound ? 'Mute' : 'Turn sound on'));
+      if (visible) play();
+    };
+
+    // drag / swipe
+    stage.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0 || e.target.closest('[data-vc-sound]')) return;
+      drag = { x: e.clientX, pos: st.pos, moved: false, id: e.pointerId };
+      gsap.killTweensOf(st, 'pos');
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const dx = e.clientX - drag.x;
+      if (!drag.moved && Math.abs(dx) > 6) { drag.moved = true; stage.classList.add('is-drag'); }
+      if (!drag.moved) return;
+      const w = cards[0].offsetWidth * (small.matches ? 0.6 : 0.8);
+      st.pos = drag.pos - dx / w;
+      render();
+    });
+    const endDrag = () => {
+      if (!drag) return;
+      const d = drag;
+      stage.classList.remove('is-drag');
+      if (d.moved) {
+        const delta = st.pos - d.pos;
+        const steps = Math.abs(delta) < 0.15 ? 0 : Math.sign(delta) * Math.max(1, Math.round(Math.abs(delta)));
+        go(Math.round(d.pos) + steps);
+        setTimeout(() => { drag = null; }, 0);
+      } else drag = null;
+    };
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
+
+    // slight 3D tilt toward the pointer
+    if (motion && fine) {
+      const tx = gsap.quickTo(st, 'tx', { duration: 0.8, ease: 'power3.out', onUpdate: render });
+      const ty = gsap.quickTo(st, 'ty', { duration: 0.8, ease: 'power3.out', onUpdate: render });
+      stage.addEventListener('pointermove', (e) => {
+        if (drag && drag.moved) return;
+        const r = stage.getBoundingClientRect();
+        tx(((e.clientY - r.top) / r.height - 0.5) * -6);
+        ty(((e.clientX - r.left) / r.width - 0.5) * 8);
+      });
+      stage.addEventListener('pointerleave', () => { tx(0); ty(0); });
+    }
+
+    // fan out as the section scrolls in, and turn a little while it scrolls past
+    if (motion) {
+      gsap.to(st, { spread: 1, ease: 'none', onUpdate: render, scrollTrigger: { trigger: stage, start: 'top 95%', end: 'top 35%', scrub: 0.8 } });
+      gsap.fromTo(st, { sy: 10 }, { sy: -10, ease: 'none', onUpdate: render, scrollTrigger: { trigger: sec, start: 'top bottom', end: 'bottom top', scrub: 1 } });
+    }
+
+    new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible) play(); else stop();
+    }, { threshold: 0.4 }).observe(stage);
+    small.addEventListener('change', render);
+    window.addEventListener('resize', render);
+    setActive(0);
+    render();
+  }
+
   /* ---------------- FAQ ---------------- */
   function initFaq() {
     const list = $('[data-faq]');
@@ -865,6 +1029,7 @@
   initBoard();
   initTeam();
   initStories();
+  initVideos();
   initFaq();
   initClocks();
   initWordmark();

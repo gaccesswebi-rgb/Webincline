@@ -464,6 +464,50 @@ require __DIR__ . '/includes/header.php';
     </div>
   </section>
 
+  <!-- ===================== VIDEO STORIES (3D) ===================== -->
+  <section class="sec sec-dark vs" id="videos" data-vs>
+    <div class="wrap">
+      <div class="head">
+        <div>
+          <p class="eb" data-rv><i></i>On camera</p>
+          <h2 class="h2" data-hd><?= title('Hear it from|*our clients.*') ?></h2>
+        </div>
+        <div class="head__side" data-rv>
+          <p class="lead">Business owners, unscripted, on what changed after working with us. Drag or swipe through the stories and tap a video to hear it.</p>
+          <div class="vs__ctl">
+            <button class="vs__arw vs__arw--p" type="button" aria-label="Previous video" data-vs-prev><?= icon('arrow') ?></button>
+            <p class="vs__idx mono"><b data-vs-idx>01</b> / <?= sprintf('%02d', count($testimonials)) ?></p>
+            <button class="vs__arw" type="button" aria-label="Next video" data-vs-next><?= icon('arrow') ?></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="vs__stage" data-vs-stage data-rv>
+      <div class="vs__ring" data-vs-ring>
+        <?php foreach ($testimonials as $i => $t): ?>
+          <article class="vc<?= $i ? '' : ' is-on' ?>" data-vc>
+            <video class="vc__v" muted playsinline preload="none" poster="<?= asset('video/' . $t['video'] . '.jpg') ?>">
+              <source src="<?= asset('video/' . $t['video'] . '.mp4') ?>" type="video/mp4">
+            </video>
+            <span class="vc__dim" aria-hidden="true"></span>
+            <div class="vc__ui">
+              <span class="vc__bar" aria-hidden="true"><b></b></span>
+              <p class="vc__top mono"><span class="vc__av"><img src="<?= asset('img/brand/webincline-icon.webp') ?>" alt="" width="40" height="22" loading="lazy"></span>Client story <?= sprintf('%02d', $i + 1) ?></p>
+              <div class="vc__bot">
+                <h3><?= e($t['company']) ?></h3>
+                <p class="mono"><?= e($t['name']) ?></p>
+              </div>
+            </div>
+            <span class="vc__play" aria-hidden="true"><?= icon('play') ?></span>
+            <button class="vc__hit" type="button" aria-label="Play story from <?= e($t['company']) ?>" data-vc-hit></button>
+            <button class="vc__snd" type="button" aria-label="Turn sound on" data-vc-sound><?= icon('mute', 'icon icon--m') ?><?= icon('sound', 'icon icon--s') ?></button>
+          </article>
+        <?php endforeach; ?>
+      </div>
+      <span class="vs__floor" aria-hidden="true"></span>
+    </div>
+  </section>
+
   <!-- ===================== INSIGHTS ===================== -->
   <section class="sec sec-light jr" id="insights">
     <div class="wrap">
