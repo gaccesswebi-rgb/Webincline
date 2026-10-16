@@ -813,7 +813,7 @@
           b.classList.toggle('is-act', i === a);
         });
       }
-      const sa = n <= 0.02 ? -1 : Math.min(steps.length - 1, Math.floor((n / N) * steps.length));
+      const sa = Math.min(steps.length - 1, Math.floor((Math.max(0, n) / N) * steps.length));
       steps.forEach((s, i) => { s.classList.toggle('is-act', i === sa); s.classList.toggle('is-done', i < sa); });
     };
 
@@ -872,9 +872,10 @@
         ctx.beginPath();
         if (q.k >= N - 1) {
           const o = Math.min(1, al + 0.4);
-          ctx.arc(x, q.y, q.r + 1.4, 0, 6.283);
+          // pink with a dark edge so it reads on the gradient fill
+          ctx.arc(x, q.y, q.r + 1.6, 0, 6.283);
           ctx.fillStyle = 'rgba(255,61,129,' + o + ')'; ctx.fill();
-          ctx.lineWidth = 1.2; ctx.strokeStyle = 'rgba(255,255,255,' + o * 0.9 + ')'; ctx.stroke();
+          ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(17,17,17,' + o * 0.85 + ')'; ctx.stroke();
         } else {
           ctx.arc(x, q.y, q.r + q.k * 0.3, 0, 6.283);
           ctx.fillStyle = 'rgba(17,17,17,' + al + ')'; ctx.fill();
@@ -891,10 +892,10 @@
     gsap.ticker.add(tick);
 
     gsap.matchMedia()
-      .add('(min-width: 1100px) and (min-height: 680px)', () => {
+      .add('(min-width: 1100px) and (min-height: 760px)', () => {
         ScrollTrigger.create({ trigger: sec, start: 'top top', end: 'bottom bottom', invalidateOnRefresh: true, onUpdate: (st) => set(st.progress), onRefresh: (st) => { measure(); set(st.progress); } });
       })
-      .add('(max-width: 1099px), (max-height: 679px)', () => {
+      .add('(max-width: 1099px), (max-height: 759px)', () => {
         ScrollTrigger.create({ trigger: fun, start: 'top 85%', end: 'bottom 45%', invalidateOnRefresh: true, onUpdate: (st) => set(st.progress), onRefresh: (st) => { measure(); set(st.progress); } });
       });
     set(0);
