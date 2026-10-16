@@ -564,8 +564,6 @@ ul, ol { padding: 0; list-style: none; }
 @keyframes prog { to { transform: scaleX(1); } }
 .wk__stage { display: grid; }
 .wk__case { grid-area: 1 / 1; }
-.wk__case.is-on { animation: fadein .8s ease both; }
-@keyframes fadein { from { opacity: 0; } }
 .cmp { --dv: .5; --dt: 1; position: relative; aspect-ratio: 2 / 1; max-height: 78svh; width: 100%; border-radius: 28px; overflow: hidden; background: #000; touch-action: pan-y; user-select: none; }
 .cmp__after, .cmp__before { position: absolute; inset: 0; }
 .cmp__after { z-index: 0; }   /* own stacking context: chart + AFTER number stay under the BEFORE layer */
@@ -599,7 +597,9 @@ ul, ol { padding: 0; list-style: none; }
 .cmp:hover .cmp__handle, .cmp.is-drag .cmp__handle, .cmp:focus-within .cmp__handle { scale: 1.22; color: #fff; background: var(--pink); }
 .cmp__cur { position: absolute; z-index: 6; left: 0; top: 0; padding: 6px 11px; border-radius: 999px; font-size: 10.5px; color: #111; background: #fff; translate: calc(var(--cx, 0px) + 16px) calc(var(--cy, 0px) + 16px); opacity: 0; transition: opacity .25s; pointer-events: none; }
 @media (hover: hover) and (pointer: fine) { .cmp:hover .cmp__cur { opacity: 1; } }
-.cmp__range { position: absolute; z-index: 7; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; touch-action: pan-y; }
+/* the range input is the keyboard control; pointers drag the frame itself */
+.cmp__range { position: absolute; z-index: 7; left: 0; bottom: 0; width: 100%; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
+.cmp { cursor: ew-resize; }
 .wk__info { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 20px clamp(28px, 4vw, 72px); padding: 30px 4px 0; }
 .wk__case.is-on .wk__info { animation: up .8s var(--ease) both; }
 @keyframes up { from { opacity: 0; translate: 0 12px; } }
@@ -1039,7 +1039,7 @@ html:not(.js) .tn { position: relative; }
   .pn.is-open .pn__pin { padding-bottom: 20px; }
   .pn__vis { min-height: 330px; }
   .pn__vis:has(.ui--ads) { min-height: 410px; }
-  .ui--ads .ui-bars { min-height: 72px; }
+  .ui--ads .ui-bars { min-height: 110px; }
   .ui--ads .ui-toast--b { top: 14px; right: 14px; bottom: auto; }
   .pn__tx h3 { display: none; }
   .sv__hint { display: none; }
@@ -1079,6 +1079,7 @@ html:not(.js) .tn { position: relative; }
   .cmp__lbl { display: none; }
   .cmp { aspect-ratio: 4 / 5; border-radius: 20px; }
   .cmp__ch { height: 46%; }
+  .cmp__a { top: 60px; bottom: auto; }
   .cmp__b { bottom: clamp(96px, 26vw, 120px); }
   .cmp__b b { font-size: clamp(2.2rem, 11vw, 3rem); }
   .cmp__a b { font-size: clamp(3rem, 17vw, 4.4rem); }

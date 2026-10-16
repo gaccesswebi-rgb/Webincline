@@ -217,16 +217,16 @@ $funnel = [
 /* Results dashboard tiles. 'bars' are drawn to scale (before vs after). */
 $dashboard = [
     'seo' => [
-        ['value' => '3,570', 'label' => 'Organic visits a month', 'client' => 'Under Pressure', 'bars' => [59, 3570]],
-        ['value' => '20×',   'label' => 'Organic traffic growth', 'client' => 'Robot My Life',  'bars' => [131, 2927]],
-        ['value' => '75',    'label' => 'Keywords in the top 10', 'client' => 'Juvly Aesthetics', 'bars' => [0, 75]],
-        ['value' => '2,810', 'label' => 'Referring domains',      'client' => 'RSK Fragrance',  'bars' => [3, 2810]],
+        ['value' => '3,570', 'label' => 'Organic visits a month', 'client' => 'Under Pressure', 'bars' => [59, 3570], 'from' => '59 visits/mo', 'to' => '3,570 visits/mo'],
+        ['value' => '20×',   'label' => 'Organic traffic growth', 'client' => 'Robot My Life',  'bars' => [131, 2927], 'from' => '131 visits/mo', 'to' => '2,927 visits/mo'],
+        ['value' => '75',    'label' => 'Keywords in the top 10', 'client' => 'Juvly Aesthetics', 'bars' => [0, 75], 'from' => '0 keywords', 'to' => '75 keywords'],
+        ['value' => '2,810', 'label' => 'Referring domains',      'client' => 'RSK Fragrance',  'bars' => [3, 2810], 'from' => '3 domains', 'to' => '2,810 domains'],
     ],
     'ads' => [
-        ['value' => '60×',    'label' => 'Return on ad spend',  'client' => 'Beauty Basket',  'bars' => [252, 15240]],
-        ['value' => '15.24M', 'label' => 'Sales from 252k spend', 'client' => 'Beauty Basket', 'bars' => [252, 15240]],
-        ['value' => '652',    'label' => 'Conversions',          'client' => 'Indogulf BioAg', 'bars' => [0, 652]],
-        ['value' => '50×',    'label' => 'More leads a month',   'client' => 'VIEC',           'bars' => [1, 50]],
+        ['value' => '60×',    'label' => 'Return on ad spend',  'client' => 'Beauty Basket',  'bars' => [252, 15240], 'from' => '252k spend', 'to' => '15.24M sales'],
+        ['value' => '15.24M', 'label' => 'Sales from 252k spend', 'client' => 'Beauty Basket', 'bars' => [252, 15240], 'from' => '252k spend', 'to' => '15.24M sales'],
+        ['value' => '652',    'label' => 'Conversions',          'client' => 'Indogulf BioAg', 'bars' => [0, 652], 'from' => '0 conversions', 'to' => '652 conversions'],
+        ['value' => '50×',    'label' => 'More leads a month',   'client' => 'VIEC',           'bars' => [1, 50], 'from' => '1×', 'to' => '50× leads'],
     ],
 ];
 

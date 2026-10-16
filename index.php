@@ -332,18 +332,16 @@ require __DIR__ . '/includes/header.php';
         <?php foreach ($dashboard as $key => $tiles): ?>
           <div class="board__grid" data-board-panel="<?= e($key) ?>" <?= $key === 'seo' ? '' : 'hidden' ?>>
             <?php foreach ($tiles as $i => $t):
-              [$from, $to] = $t['bars'];
               $wv = wave_values($t['client'] . $t['label'], 12, 1.35, .08);
               $pts = wave_points($wv, 300, 74, 8);
               $d = wave_line($pts);
-              $vals = array_map(static fn (float $u): float => round($from + $u * ($to - $from), 2), $wv);
               $gid = 'tl-' . $key . '-' . $i;
             ?>
               <div class="tile">
                 <p class="mono tile__l"><b><?= sprintf('%02d', $i + 1) ?></b> <?= e($t['label']) ?></p>
                 <p class="tile__v"><?= e($t['value']) ?></p>
                 <span class="chip mono"><i class="live"></i><?= e($t['client']) ?></span>
-                <div class="tile__sp" style="--i:<?= $i ?>" data-vals="<?= e(json_encode($vals)) ?>" role="img" aria-label="Grew from <?= e((string) $from) ?> to <?= e((string) $to) ?>">
+                <div class="tile__sp" style="--i:<?= $i ?>" data-from="<?= e($t['from']) ?>" data-to="<?= e($t['to']) ?>" role="img" aria-label="From <?= e($t['from']) ?> to <?= e($t['to']) ?>">
                   <svg viewBox="0 -4 300 88" preserveAspectRatio="none" aria-hidden="true">
                     <defs><linearGradient id="<?= $gid ?>" x1="0" x2="1"><stop offset="0" stop-color="#FF7A00"/><stop offset=".5" stop-color="#FF3D81"/><stop offset="1" stop-color="#7B4DFF"/></linearGradient></defs>
                     <path class="tile__area" d="<?= $d ?> L300 84 L0 84Z"/>

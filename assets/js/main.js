@@ -743,13 +743,52 @@
         if (hasGSAP) gsap.killTweensOf(S);
         S.mode = 'manual'; S.man = range.value / 100; S.dv = S.man; paint(S.dv); run();
       });
+      // Pointer dragging. A mouse grabs straight away; a finger only takes over once it
+      // clearly moves sideways, so a vertical swipe on the frame still scrolls the page.
+      let ptr = null;
+      const setFromX = (x) => {
+        const r = cmp.getBoundingClientRect();
+        S.man = clamp((x - r.left) / r.width, 0.03, 0.97);
+        S.dv = S.man;
+        paint(S.dv);
+      };
+      const grab = (e) => {
+        ptr.on = true;
+        dragging = true;
+        cmp.classList.add('is-drag');
+        try { cmp.setPointerCapture(e.pointerId); } catch (err) { /* pointer already gone */ }
+        if (hasGSAP) gsap.killTweensOf(S);
+        S.mode = 'manual';
+        setFromX(e.clientX);
+        run();
+      };
+      const release = () => {
+        ptr = null;
+        if (!dragging) return;
+        dragging = false;
+        cmp.classList.remove('is-drag');
+        run();
+      };
+      cmp.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0) return;
+        ptr = { id: e.pointerId, x: e.clientX, y: e.clientY, on: false };
+        if (e.pointerType === 'mouse') grab(e);
+      });
       cmp.addEventListener('pointermove', (e) => {
         const r = cmp.getBoundingClientRect();
         cmp.style.setProperty('--cx', e.clientX - r.left + 'px');
         cmp.style.setProperty('--cy', e.clientY - r.top + 'px');
+        if (!ptr || e.pointerId !== ptr.id) return;
+        if (!ptr.on) {
+          const dx = e.clientX - ptr.x, dy = e.clientY - ptr.y;
+          if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) grab(e);
+          else if (Math.abs(dy) > 8) ptr = null;
+          return;
+        }
+        setFromX(e.clientX);
       });
-      cmp.addEventListener('pointerdown', () => { dragging = true; cmp.classList.add('is-drag'); run(); });
-      window.addEventListener('pointerup', () => { if (!dragging) return; dragging = false; cmp.classList.remove('is-drag'); run(); });
+      window.addEventListener('pointerup', release);
+      window.addEventListener('pointercancel', release);
     });
     stage.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') { hovering = true; run(); } });
     stage.addEventListener('pointerleave', () => { hovering = false; run(); });
@@ -927,7 +966,13 @@
         p.hidden = p.dataset.boardPanel !== t.dataset.boardTab;
         if (p.hidden) return;
         show(p);
-        if (motion) { const o = { v: 0.2 }; gsap.to(o, { v: 1, duration: 1.4, ease: 'power2.out', onUpdate: () => p.style.setProperty('--sp', o.v.toFixed(4)) }); }
+        refresh();
+        if (motion) {
+          // draw the new tab's lines in, then hand back to the scroll-driven value
+          const to = parseFloat(board.style.getPropertyValue('--sp')) || 1;
+          const o = { v: 0.2 };
+          gsap.to(o, { v: to, duration: 1.4, ease: 'power2.out', onUpdate: () => p.style.setProperty('--sp', o.v.toFixed(4)), onComplete: () => p.style.removeProperty('--sp') });
+        }
       });
     }));
     inView(board, () => show($('[data-board-panel]:not([hidden])', board)), { threshold: 0.3 });
@@ -942,23 +987,31 @@
         if (Math.abs(goal - cur) < 5e-4) cur = goal;
         board.style.setProperty('--sp', cur.toFixed(4));
       });
+      // phones stack the tiles 2x2, so each sparkline follows its own position instead
+      gsap.matchMedia().add('(max-width: 640px)', () => {
+        const undo = $$('.tile__sp', board).map((sp) => {
+          const i0 = sp.style.getPropertyValue('--i');
+          sp.style.setProperty('--i', 0);
+          const put = (st) => sp.style.setProperty('--sp', (0.2 + st.progress * 0.6).toFixed(4));
+          ScrollTrigger.create({ trigger: sp, start: 'top 95%', end: 'top 55%', onUpdate: put, onRefresh: put });
+          return () => { sp.style.removeProperty('--sp'); sp.style.setProperty('--i', i0); };
+        });
+        return () => undo.forEach((f) => f());
+      });
     }
 
     $$('.tile__sp', board).forEach((sp) => {
-      const vals = JSON.parse(sp.dataset.vals || '[]');
       const path = $('.tile__ln', sp), svg = $('svg', sp), pt = $('.tile__pt', sp), tt = $('.tile__tt', sp);
-      const tile = sp.closest('.tile');
-      const value = tile ? $('.tile__v', tile).textContent.trim() : '';
-      if (vals.length < 2) return;
       const ys = (path.getAttribute('d').match(/-?[\d.]+ -?[\d.]+/g) || []).map((q) => Number(q.split(' ')[1]));
-      const n = vals.length;
+      const n = ys.length;
+      if (n < 2) return;
       svg.addEventListener('pointermove', (e) => {
         const r = svg.getBoundingClientRect();
         const i = clamp(Math.round(((e.clientX - r.left) / r.width) * (n - 1)), 0, n - 1);
         pt.hidden = tt.hidden = false;
         pt.style.left = tt.style.left = (i / (n - 1)) * 100 + '%';
         pt.style.top = tt.style.top = ((ys[i] + 4) / 88) * 100 + '%';
-        tt.textContent = i === 0 ? 'Before · ' + fmt(vals[0]) : i === n - 1 ? 'After · ' + value : 'Month ' + (i + 1);
+        tt.textContent = i === 0 ? 'Before · ' + sp.dataset.from : i === n - 1 ? 'After · ' + sp.dataset.to : 'Month ' + (i + 1);
       });
       svg.addEventListener('pointerleave', () => { pt.hidden = tt.hidden = true; });
     });

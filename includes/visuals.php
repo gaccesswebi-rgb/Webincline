@@ -40,7 +40,7 @@ function channel_visual(string $key): string
                 <div class="ui-g" style="--p:.86"><span class="ui-g__arc"></span><b>60×</b><span class="mono">ROAS</span></div>
               </div>
               <div class="ui-bars" aria-hidden="true">
-                <?php foreach ([24, 34, 30, 47, 58, 53, 92] as $i => $h): ?>
+                <?php foreach ([26, 44, 31, 52, 68, 49, 92] as $i => $h): ?>
                   <i style="--h:<?= $h ?>%;--d:<?= $i * 0.08 ?>s"<?= $i === 6 ? ' class="is-peak"' : '' ?>></i>
                 <?php endforeach; ?>
               </div>
