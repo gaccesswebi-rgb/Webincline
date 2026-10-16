@@ -267,6 +267,7 @@
     const pulses = [];
     const spotT = SPOTS.map(() => -99);
     let chipN = 0, chipLive = 0;
+    const live = [];
     let px = 0, py = 0, tx = 0, ty = 0, hov = 0, lastMove = -99, lastPulse = -99, inside = false, scrollP = 0;
     let rects = [];
 
@@ -286,6 +287,10 @@
 
     const pop = (x, y) => {
       if (chipLive >= 4 || !texts.length) return;
+      // never stack a chip on one that is still showing
+      if (live.some((c) => Math.abs(c[0] - x) < 150 && Math.abs(c[1] - y) < 44)) return;
+      const spot = [x, y];
+      live.push(spot);
       chipLive++;
       const el = document.createElement('span');
       el.className = 'pop';
@@ -294,7 +299,7 @@
       pops.appendChild(el);
       requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-up')));
       setTimeout(() => el.classList.remove('is-up'), 2600);
-      setTimeout(() => { el.remove(); chipLive--; }, 3200);
+      setTimeout(() => { el.remove(); chipLive--; live.splice(live.indexOf(spot), 1); }, 3200);
     };
 
     // pointer

@@ -126,6 +126,7 @@ ul, ol { padding: 0; list-style: none; }
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
+.hero__h .grad { background-image: linear-gradient(90deg, #FF7A00 0%, #FF3D81 36%, #9670FF 70%, #5FA4FF 100%), linear-gradient(var(--fg), var(--fg)); }
 .sec-grad .grad { position: relative; background: none; color: var(--fg); }
 .sec-grad .grad::after { content: ""; position: absolute; left: 0; right: .02em; bottom: .02em; height: .085em; border-radius: .05em; background: var(--ink); transform: scaleX(var(--ul, 1)); transform-origin: left; transition: transform .9s var(--ease-io) .5s; }
 .lead { max-width: 52ch; font-size: clamp(1rem, 1.15vw, 1.1rem); line-height: 1.6; color: var(--mut); }
@@ -260,7 +261,7 @@ ul, ol { padding: 0; list-style: none; }
 /* ---------- hero ---------- */
 .hero { position: relative; height: 100vh; height: 100svh; min-height: 680px; overflow: hidden; isolation: isolate; color: #f5f5f5; background: #111111; }
 .hero__bg { position: absolute; inset: 0; z-index: -2; overflow: hidden; translate: 0 calc(var(--sy, 0) * 14%); }
-.hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(.5) contrast(1.05); transform: scale(1.12); transition: transform 2.2s var(--ease), opacity .6s; }
+.hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) brightness(.36) contrast(1.05); transform: scale(1.12); transition: transform 2.2s var(--ease), opacity .6s; }
 .hero.is-in .hero__img { transform: scale(1); }
 .hero.is-gl .hero__img { opacity: 0; }
 .hero__gl { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity .8s; }
@@ -278,7 +279,7 @@ ul, ol { padding: 0; list-style: none; }
 .hero.has-cur a, .hero.has-cur button { cursor: pointer; }
 .hero.has-cur .hero__cur { opacity: 1; }
 .hero.has-cur.is-over .hero__cur { opacity: 0; }
-.hero__hint { position: absolute; z-index: 2; top: 104px; right: max(var(--pad), env(safe-area-inset-right, 0px)); display: flex; align-items: center; gap: 10px; color: rgba(245, 245, 245, .66); font-size: 10.5px; }
+.hero__hint { position: absolute; z-index: 2; top: 104px; right: max(var(--pad), env(safe-area-inset-right, 0px)); display: flex; align-items: center; gap: 10px; color: rgba(245, 245, 245, .86); font-size: 10.5px; }
 .hero__in { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding-top: 70px; padding-bottom: 150px; text-align: center; pointer-events: none; }
 .hero__in a, .hero__in button { pointer-events: auto; }
 .hero__in .note { margin-bottom: 30px; color: #f5f5f5; background: rgba(17, 17, 17, .4); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14); }
@@ -335,7 +336,7 @@ ul, ol { padding: 0; list-style: none; }
 .blip__bdg { transform-origin: 14px 100%; }
 .blip.is-l .blip__bdg { transform-origin: calc(100% - 14px) 100%; }
 
-.logos { display: grid; gap: 12px; margin-top: clamp(56px, 6vw, 88px); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.logos { display: grid; gap: 12px; margin-top: clamp(56px, 6vw, 88px); mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); }
 .mq { display: flex; overflow: hidden; }
 .mq__track { display: flex; gap: 12px; padding-right: 12px; flex: none; min-width: max-content; animation: mq 60s linear infinite; }
 .mq--rev .mq__track { animation-direction: reverse; }
@@ -614,7 +615,7 @@ ul, ol { padding: 0; list-style: none; }
 .fn { padding: 0 0 32px; height: 320vh; height: 320svh; }   /* bottom padding takes the #results card's -32px overlap */
 .fn__sticky { position: sticky; top: 0; height: 100vh; height: 100svh; display: flex; align-items: stretch; overflow: clip; }
 .fn__grid { display: grid; height: 100%; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 48px clamp(40px, 5.5vw, 80px); align-items: start;
-  padding-block: max(calc(var(--hd-h) + 40px), 12svh) max(72px, 9svh); }
+  align-content: safe center; padding-block: max(calc(var(--hd-h) + 40px), 12svh) max(72px, 9svh); }
 .fn .h2 { font-size: clamp(2.5rem, min(4.6vw, 7.4svh), 4.2rem); }
 .fn__l .lead { margin-top: 18px; }
 .steps { margin-top: 22px; border-top: 1px solid var(--line); }
