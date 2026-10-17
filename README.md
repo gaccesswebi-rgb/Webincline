@@ -14,7 +14,10 @@ php -S 127.0.0.1:8080 router.php
 
 Then open http://127.0.0.1:8080. Pass `router.php` so clean addresses such as `/services` work; Apache hosting does the same through `.htaccess`.
 
-Installing PHP: on Windows, XAMPP (apachefriends.org) or the zip from windows.php.net; on macOS, `brew install php`; on Ubuntu, `sudo apt install php-cli`.
+Installing PHP:
+- Windows with XAMPP (apachefriends.org): in the project folder run `C:\xampp\php\php.exe -S 127.0.0.1:8080 router.php`. Don't open it from a subfolder of `htdocs`; the site must run at the root of its address.
+- Windows with the zip from windows.php.net: copy `php.ini-development` to `php.ini` and enable `extension=mbstring`.
+- macOS: `brew install php`. Ubuntu: `sudo apt install php-cli php-mbstring`.
 The contact form saves every lead to `storage/leads.csv`; it only sends email on a server where PHP's `mail()` is set up.
 
 ## Where things live
