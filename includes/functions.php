@@ -43,10 +43,10 @@ function csrf_token(): string
  */
 function title(string $text): string
 {
-    $lines = array_map(static function (string $line): string {
+    $lines = array_map(static function (string $line, int $k): string {
         $html = preg_replace('/\*(.+?)\*/', '<span class="grad">$1</span>', e(trim($line)));
-        return '<span class="ln"><span class="ln__in">' . $html . '</span></span>';
-    }, explode('|', $text));
+        return '<span class="ln"><span class="ln__in" style="--k:' . $k . '">' . $html . '</span></span>';
+    }, $parts = explode('|', $text), array_keys($parts));
     return implode(' ', $lines);
 }
 

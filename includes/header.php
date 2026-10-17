@@ -42,36 +42,25 @@ $org_schema = [
 
 <link rel="icon" type="image/png" sizes="32x32" href="<?= asset('img/brand/favicon-32.png') ?>">
 <link rel="apple-touch-icon" href="<?= asset('img/brand/apple-touch-icon.png') ?>">
-<link rel="preload" as="image" href="<?= asset('img/photos/hero-crowd.webp') ?>">
+<link rel="preload" as="image" href="<?= asset('img/photos/hero-crowd-1280.webp') ?>" imagesrcset="<?= asset('img/photos/hero-crowd-828.webp') ?> 828w, <?= asset('img/photos/hero-crowd-1280.webp') ?> 1280w, <?= asset('img/photos/hero-crowd-1600.webp') ?> 1600w, <?= asset('img/photos/hero-crowd-2000.webp') ?> 2000w" imagesizes="100vw" fetchpriority="high">
+<!-- fonts are self-hosted (assets/fonts); the two above-the-fold weights load first -->
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/poppins-600.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/poppins-400.woff2" crossorigin>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Poppins:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="<?= asset('css/main.css') ?>">
 
 <script>
   (function (root) {
     root.classList.remove('no-js'); root.classList.add('js');
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) root.classList.add('motion');
-    try { if (sessionStorage.getItem('wi-intro')) root.classList.add('intro-seen'); } catch (e) {}
     // If the animation scripts never start, show everything anyway.
-    setTimeout(function () { if (!window.wiReady) { root.classList.remove('motion'); root.classList.add('intro-seen'); } }, 4000);
+    setTimeout(function () { if (!window.wiReady) root.classList.remove('motion'); }, 4000);
   })(document.documentElement);
 </script>
 <script type="application/ld+json"><?= json_encode($org_schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
-
-<div class="intro" aria-hidden="true">
-  <div class="intro__ring"></div>
-  <div class="intro__inner">
-    <img class="intro__logo" src="<?= asset('img/brand/webincline-icon.webp') ?>" alt="" width="120" height="64">
-    <p class="intro__count"><span data-intro-count>0</span><small>%</small></p>
-    <p class="intro__label mono"><?= e(SITE_TAGLINE) ?></p>
-  </div>
-  <p class="intro__skip mono">Click or press Esc to skip</p>
-</div>
 
 <header class="hd" data-header>
   <div class="hd__bar">

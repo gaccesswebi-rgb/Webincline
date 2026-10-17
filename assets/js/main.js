@@ -64,28 +64,6 @@
     });
   }
 
-  /* ---------------- intro ---------------- */
-  function runIntro(done) {
-    const intro = $('.intro');
-    if (!intro || root.classList.contains('intro-seen') || !motion) { root.classList.add('intro-seen'); done(); return; }
-    const out = $('[data-intro-count]', intro);
-    let finished = false;
-    const finish = () => {
-      if (finished) return;
-      finished = true;
-      try { sessionStorage.setItem('wi-intro', '1'); } catch (e) { /* storage blocked */ }
-      gsap.to(intro, { clipPath: 'inset(0 0 100% 0)', duration: 0.9, ease: 'expo.inOut', onComplete: () => root.classList.add('intro-seen') });
-      setTimeout(done, 380);
-    };
-    const n = { v: 0 };
-    const tl = gsap.timeline({ onComplete: finish });
-    tl.from('.intro__logo', { scale: 0.7, opacity: 0, duration: 0.6, ease: 'back.out(1.7)' })
-      .to(n, { v: 100, duration: 1.3, ease: 'power2.inOut', onUpdate: () => { out.textContent = Math.round(n.v); } }, 0.1);
-    const skip = () => { tl.kill(); out.textContent = '100'; finish(); };
-    intro.addEventListener('click', skip, { once: true });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') skip(); }, { once: true });
-  }
-
   /* ---------------- header ---------------- */
   function initHeader() {
     const hd = $('[data-header]');
@@ -178,8 +156,6 @@
 
   /* ---------------- reveals ---------------- */
   function initReveals() {
-    $$('[data-hd]').forEach((h) => $$('.ln__in', h).forEach((l, i) => l.style.setProperty('--k', i)));
-    $$('.hero__h .ln__in').forEach((l, i) => l.style.setProperty('--k', i));
     if (!motion) return;
     const io = new IntersectionObserver((es) => es.forEach((e) => {
       if (!e.isIntersecting) return;
@@ -243,14 +219,11 @@
   // Spots (0–1 of the hero) where notification chips can pop.
   const SPOTS = [[.12, .2], [.2, .34], [.08, .5], [.16, .62], [.26, .74], [.1, .8], [.36, .2], [.62, .2], [.78, .14], [.9, .26], [.86, .4], [.92, .54], [.8, .66], [.72, .8], [.9, .78], [.3, .5], [.7, .5], [.5, .14], [.44, .82], [.58, .84]];
 
-  function initHero(onReady) {
+  function initHero() {
     const hero = $('[data-hero]');
-    if (!hero) { onReady(() => {}); return; }
+    if (!hero) return;
     setTimeout(() => hero.classList.add('is-in'), 60);
-    onReady(() => {
-      hero.classList.add('is-ready');
-      $$('[data-odo]', hero).forEach(odometer);
-    });
+    $$('[data-odo]', hero).forEach(odometer);
     if (!motion) return;
 
     const cv = $('[data-hero-gl]', hero);
@@ -260,7 +233,7 @@
     const texts = JSON.parse(hero.dataset.chips || '[]');
     const avoid = [$('.hero__in .note', hero), $('.hero__h', hero), $('.hero__sub', hero), $('.hero__cta', hero), $('.hero__foot', hero), $('.hero__hint', hero)].filter(Boolean);
 
-    const gl = cv.getContext('webgl', { antialias: false, alpha: false, premultipliedAlpha: false });
+    let gl = null;
     let W = 1, H = 1, dpr = 1, diag = 1, imgRatio = 1.5, ready = false;
     const t0 = performance.now();
     const now = () => (performance.now() - t0) / 1000;
@@ -273,7 +246,8 @@
 
     const measure = () => {
       const r = hero.getBoundingClientRect();
-      W = r.width; H = r.height; dpr = Math.min(window.devicePixelRatio || 1, 1.6);
+      // phones draw the (soft, darkened) effect at 1x; it is not worth 3x the pixels
+      W = r.width; H = r.height; dpr = Math.min(window.devicePixelRatio || 1, fine ? 1.5 : 1);
       cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); diag = Math.hypot(W, H);
       if (gl) gl.viewport(0, 0, cv.width, cv.height);
       rects = avoid.map((el) => { const b = el.getBoundingClientRect(); return [b.left - r.left - 70, b.top - r.top - 30, b.right - r.left + 70, b.bottom - r.top + 24]; });
@@ -321,9 +295,13 @@
       pulse(x, y, 1.6);
     });
 
-    // WebGL setup
+    // WebGL starts once the page has loaded and the browser is idle, so it never
+    // competes with the first paint; until then the static photo is shown.
     const U = {};
-    if (gl) {
+    const startGL = () => {
+      gl = cv.getContext('webgl', { antialias: false, alpha: false, premultipliedAlpha: false });
+      if (!gl) return;
+      measure();
       const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
       const prog = gl.createProgram();
       gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT));
@@ -353,6 +331,12 @@
         };
         im.src = img.currentSrc || img.src;
       }
+    };
+    const saveData = navigator.connection && navigator.connection.saveData;
+    if (!saveData) {
+      const idle = window.requestIdleCallback || ((f) => setTimeout(f, 200));
+      const go = () => idle(startGL, { timeout: 1500 });
+      if (document.readyState === 'complete') go(); else window.addEventListener('load', go, { once: true });
     }
 
     const P = new Float32Array(32);
@@ -1406,23 +1390,21 @@
   }
 
   /* ---------------- boot ---------------- */
+  // The first screen is set up straight away. Everything below it is set up in idle
+  // time, one section per task, so the browser can paint between them.
   initSmooth();
   initHeader();
   initMagnetic();
   initReveals();
-  initRadar();
-  initCrowd();
-  initServices();
-  initWork();
-  initFunnel();
-  initBoard();
-  initTeam();
-  initReviews();
-  initVideos();
-  initFaq();
-  initClocks();
-  initWordmark();
-  initForm();
-  initHero((reveal) => runIntro(reveal));
+  initHero();
+  const later = [initForm, initServices, initRadar, initCrowd, initWork, initFunnel, initBoard, initTeam, initReviews, initVideos, initFaq, initClocks, initWordmark];
+  const idle = window.requestIdleCallback || ((f) => setTimeout(f, 16));
+  const next = () => {
+    const f = later.shift();
+    if (!f) { refresh(); return; }
+    f();
+    idle(next, { timeout: 400 });
+  };
+  idle(next, { timeout: 400 });
   window.addEventListener('load', refresh);
 })();

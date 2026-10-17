@@ -6,6 +6,12 @@
    Brand: #FF7A00 orange · #FF3D81 pink · #7B4DFF violet · #3A8DFF blue · #111111 ink
    ========================================================================== */
 
+/* ---------- fonts (self-hosted, latin subset) ---------- */
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/poppins-400.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 500; font-display: swap; src: url("../fonts/poppins-500.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-style: normal; font-weight: 600 700; font-display: swap; src: url("../fonts/poppins-600.woff2") format("woff2"); }
+@font-face { font-family: "Geist Mono"; font-style: normal; font-weight: 400 500; font-display: swap; src: url("../fonts/geist-mono.woff2") format("woff2"); }
+
 @property --gw { syntax: "<percentage>"; inherits: false; initial-value: 100%; }
 
 :root {
@@ -175,18 +181,6 @@ ul, ol { padding: 0; list-style: none; }
 .btn--line:hover { color: var(--bg); }
 .btn--line .btn__ic { color: var(--bg); background: var(--fg); }
 .btn--line:hover .btn__ic { color: #fff; background: var(--grad-warm); }
-
-/* ---------- intro ---------- */
-.intro { display: none; }
-.js:not(.intro-seen) .intro { position: fixed; inset: 0; z-index: 3000; display: grid; place-items: center; background: #111111; color: #fff; cursor: pointer; }
-.intro__ring { position: absolute; left: 50%; top: 50%; width: 420px; height: 420px; margin: -210px; border-radius: 50%; box-shadow: 0 0 0 2px #FF3D81, 0 0 80px 4px rgba(255, 61, 129, .35); opacity: 0; animation: introring 1.6s var(--ease) .2s forwards; }
-@keyframes introring { from { opacity: .9; transform: scale(.1); } to { opacity: 0; transform: scale(1.6); } }
-.intro__inner { display: grid; justify-items: center; gap: 8px; }
-.intro__logo { width: 110px; height: auto; margin-bottom: 16px; }
-.intro__count { font-size: clamp(4rem, 12vw, 8rem); font-weight: 600; line-height: 1; letter-spacing: -.06em; font-variant-numeric: tabular-nums; }
-.intro__count small { margin-left: .06em; font-size: .38em; color: #7a7a82; }
-.intro__label { color: #a3a3ad; letter-spacing: .16em; }
-.intro__skip { position: absolute; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); color: #6a6a72; font-size: 10.5px; }
 
 /* ---------- header ---------- */
 .hd { position: fixed; z-index: 1000; inset: 0 0 auto; padding-top: env(safe-area-inset-top, 0px); color: #f5f5f5; pointer-events: none; }
@@ -629,8 +623,8 @@ ul, ol { padding: 0; list-style: none; }
 .step p { margin-top: 4px; font-size: 14.5px; color: var(--mut); }
 @media (min-width: 1100px) and (min-height: 760px) {
   /* while pinned only the active step is open, so the column always fits the screen */
-  .js.motion .fn .step { opacity: .35; }
-  .js.motion .fn .step.is-done { opacity: .6; }
+  .js.motion .fn .step { opacity: .6; }
+  .js.motion .fn .step.is-done { opacity: .8; }
   .js.motion .fn .step.is-act { opacity: 1; }
   .js.motion .fn .step p { max-height: 0; opacity: 0; overflow: hidden; transition: max-height .6s var(--ease-io), opacity .4s; }
   .js.motion .fn .step.is-act p { max-height: 4.8em; min-height: 3.2em; opacity: 1; transition-delay: 0s, .15s; }
@@ -1025,15 +1019,20 @@ html:not(.js) .vc { position: relative; left: auto; top: auto; margin: 0; }
 .js.motion [data-hd].is-in .grad { --gw: 100%; }
 .js.motion .sec-grad [data-hd] .grad { --ul: 0; }
 .js.motion .sec-grad [data-hd].is-in .grad { --ul: 1; }
-.js.motion .hero__h .ln__in { translate: 0 108%; transition: translate 1.2s var(--ease); transition-delay: calc(var(--k, 0) * .12s); }
-.js.motion .hero.is-ready .hero__h .ln__in { translate: 0 0; }
-.js.motion .hero .grad { --gw: 0%; transition: --gw 1.2s var(--ease-io) .7s; }
-.js.motion .hero.is-ready .grad { --gw: 100%; }
-.js.motion [data-hi] { opacity: 0; translate: 0 22px; transition: opacity .9s var(--ease), translate .9s var(--ease); }
-.js.motion .hero.is-ready [data-hi] { opacity: 1; translate: 0 0; }
-.js.motion .hero.is-ready .hero__sub { transition-delay: .25s; }
-.js.motion .hero.is-ready .hero__cta { transition-delay: .35s; }
-.js.motion .hero.is-ready .hero__foot { transition-delay: .5s; }
+/* hero: plays from the first paint, without waiting for any script, so the
+   headline is on screen (and counted as painted) as early as possible */
+@keyframes hero-rise { from { translate: 0 .32em; filter: blur(8px); } }
+@keyframes hero-in { from { opacity: 0; translate: 0 22px; } }
+@keyframes hero-gw { from { --gw: 0%; } to { --gw: 100%; } }
+/* a soft rise rather than a clipped slide or a fade from 0: the headline is fully
+   painted from its first frame, which is what browsers time as the main content (LCP) */
+.motion .hero__h .ln { overflow: visible; }
+.motion .hero__h .ln__in { animation: hero-rise 1s var(--ease) both; animation-delay: calc(var(--k, 0) * .1s); }
+.motion .hero .grad { animation: hero-gw 1.2s var(--ease-io) .6s both; }
+.motion [data-hi] { animation: hero-in .9s var(--ease) both; }
+.motion .hero__sub { animation-delay: .2s; }
+.motion .hero__cta { animation-delay: .3s; }
+.motion .hero__foot { animation-delay: .45s; }
 
 /* ---------- responsive ---------- */
 @media (max-width: 1180px) {

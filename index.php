@@ -19,7 +19,7 @@ require __DIR__ . '/includes/header.php';
   <!-- ===================== HERO ===================== -->
   <section class="hero sec-dark" data-hero data-chips="<?= e(json_encode($hero_chips)) ?>">
     <div class="hero__bg" aria-hidden="true">
-      <img class="hero__img" src="<?= asset('img/photos/hero-crowd.webp') ?>" alt="" width="2000" height="1330" fetchpriority="high">
+      <img class="hero__img" src="<?= asset('img/photos/hero-crowd-1280.webp') ?>" srcset="<?= asset('img/photos/hero-crowd-828.webp') ?> 828w, <?= asset('img/photos/hero-crowd-1280.webp') ?> 1280w, <?= asset('img/photos/hero-crowd-1600.webp') ?> 1600w, <?= asset('img/photos/hero-crowd-2000.webp') ?> 2000w" sizes="100vw" alt="" width="2000" height="1330" fetchpriority="high" decoding="async">
       <canvas class="hero__gl" data-hero-gl></canvas>
     </div>
     <div class="hero__shade" aria-hidden="true"></div>
@@ -209,7 +209,7 @@ require __DIR__ . '/includes/header.php';
       <div class="wk__tabs" role="tablist" aria-label="Case studies" data-rv>
         <?php foreach ($case_studies as $i => $c): ?>
           <button class="wk__tab" role="tab" type="button" id="wk-tab-<?= $i ?>" aria-controls="wk-case-<?= $i ?>" aria-selected="<?= $i ? 'false' : 'true' ?>" <?= $i ? 'tabindex="-1"' : '' ?>>
-            <img src="<?= asset('img/photos/' . $c['img'] . '.webp') ?>" alt="" width="40" height="40" loading="lazy">
+            <img src="<?= asset('img/photos/' . $c['img'] . '-thumb.webp') ?>" alt="" width="40" height="40" loading="lazy">
             <span class="wk__tt"><b><?= e($c['short']) ?></b><span class="mono"><?= number_format($c['metric']['before']) ?> → <?= number_format($c['metric']['after']) ?></span></span>
             <span class="wk__prog" aria-hidden="true"></span>
           </button>
@@ -220,16 +220,18 @@ require __DIR__ . '/includes/header.php';
         <?php foreach ($case_studies as $i => $c):
           $m = $c['metric'];
           $img = asset('img/photos/' . $c['img'] . '.webp');
+          $srcset = asset('img/photos/' . $c['img'] . '-800.webp') . ' 800w, ' . asset('img/photos/' . $c['img'] . '-1200.webp') . ' 1200w, ' . $img . ' 1600w';
+          $sizes = '(max-width: 640px) 170vw, min(92vw, 1520px)';
           // month-by-month shape of the climb (illustrative between the two real numbers)
           $wd = wave_path(wave_points(wave_values($c['short'], 13), 1000, 276, 40));
           $rb = wave_rng($c['short'] . '/before');
           $bl = [];
           for ($k = 0; $k <= 12; $k++) { $bl[] = [$k / 12 * 1000, 262 + ($k ? ($rb() - .5) * 14 : 0)]; }
         ?>
-          <article class="wk__case<?= $i ? '' : ' is-on' ?>" role="tabpanel" id="wk-case-<?= $i ?>" aria-labelledby="wk-tab-<?= $i ?>" <?= $i ? 'hidden' : '' ?>>
+          <div class="wk__case<?= $i ? '' : ' is-on' ?>" role="tabpanel" id="wk-case-<?= $i ?>" aria-labelledby="wk-tab-<?= $i ?>" <?= $i ? 'hidden' : '' ?>>
             <div class="cmp" data-cmp>
               <div class="cmp__after">
-                <img src="<?= $img ?>" alt="<?= e($c['client']) ?>" width="1600" height="1066" loading="lazy">
+                <img src="<?= $img ?>" srcset="<?= $srcset ?>" sizes="<?= $sizes ?>" alt="<?= e($c['client']) ?>" width="1600" height="1066" loading="lazy" decoding="async">
                 <svg class="cmp__ch cmp__ch--a" viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true">
                   <defs>
                     <linearGradient id="cmp-ln-<?= $i ?>" x1="0" x2="1"><stop offset="0" stop-color="#FF7A00"/><stop offset=".36" stop-color="#FF3D81"/><stop offset=".7" stop-color="#7B4DFF"/><stop offset="1" stop-color="#3A8DFF"/></linearGradient>
@@ -241,7 +243,7 @@ require __DIR__ . '/includes/header.php';
                 <div class="cmp__a"><span class="chip chip--grad mono"><i class="live"></i>After · <?= e($m['to']) ?></span><b data-count="<?= (int) $m['after'] ?>" data-from="<?= (int) $m['before'] ?>"><?= number_format($m['after']) ?></b></div>
               </div>
               <div class="cmp__before">
-                <img src="<?= $img ?>" alt="" width="1600" height="1066" loading="lazy">
+                <img src="<?= $img ?>" srcset="<?= $srcset ?>" sizes="<?= $sizes ?>" alt="" width="1600" height="1066" loading="lazy" decoding="async">
                 <svg class="cmp__ch cmp__ch--b" viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true"><path class="cmp__fl" d="<?= wave_line($bl) ?>"/></svg>
                 <div class="cmp__b"><span class="chip mono">Before · <?= e($m['from']) ?></span><b><?= number_format($m['before']) ?></b></div>
               </div>
@@ -264,7 +266,7 @@ require __DIR__ . '/includes/header.php';
                 </div>
               </div>
             </div>
-          </article>
+          </div>
         <?php endforeach; ?>
       </div>
     </div>
@@ -529,7 +531,7 @@ require __DIR__ . '/includes/header.php';
       <div class="vs__ring" data-vs-ring>
         <?php foreach ($testimonials as $i => $t): ?>
           <article class="vc<?= $i ? '' : ' is-on' ?>" data-vc>
-            <video class="vc__v" muted playsinline preload="none" poster="<?= asset('video/' . $t['video'] . '.jpg') ?>">
+            <video class="vc__v" muted playsinline preload="none" poster="<?= asset('video/' . $t['video'] . '.webp') ?>">
               <source src="<?= asset('video/' . $t['video'] . '.mp4') ?>" type="video/mp4">
               <track kind="captions" srclang="en" label="<?= e($t['captions']) ?>" src="<?= asset('video/' . $t['video'] . '.vtt') ?>" default>
             </video>
