@@ -1,13 +1,8 @@
 <?php
 declare(strict_types=1);
 
-require __DIR__ . '/includes/config.php';
-require __DIR__ . '/includes/functions.php';
-require __DIR__ . '/includes/data.php';
-require __DIR__ . '/includes/visuals.php';
+require_once __DIR__ . '/includes/bootstrap.php';
 
-$csrf        = csrf_token();
-$form_status = $_GET['status'] ?? '';
 $page_title  = 'Webincline — Digital Marketing Agency | SEO, Ads, Websites, CRM & AI';
 
 $ring_r = ['local' => 0.3, 'regional' => 0.5, 'national' => 0.68, 'global' => 0.84];
@@ -175,7 +170,7 @@ require __DIR__ . '/includes/header.php';
                   </div>
                   <div class="pn__foot">
                     <span class="pn__stat mono"><i class="live"></i><?= e($c['proof']) ?></span>
-                    <a class="btn btn--solid btn--sm" href="#contact" data-mag><span class="btn__lb">Talk to us</span><span class="btn__ic"><?= icon('arrow-up') ?></span></a>
+                    <a class="btn btn--solid btn--sm" href="<?= e(link_or(service_path($c['pillar']), link_or('/services', '#contact') . (page_url('/services') ? '#' . $c['pillar'] : ''))) ?>" data-mag><span class="btn__lb"><?= page_url('/services') ? 'Explore ' . e($services[$c['pillar']]['title']) : 'Talk to us' ?></span><span class="btn__ic"><?= icon('arrow-up') ?></span></a>
                   </div>
                 </div>
               </div>
@@ -272,44 +267,7 @@ require __DIR__ . '/includes/header.php';
     </div>
   </section>
 
-  <!-- ===================== PROCESS + FUNNEL ===================== -->
-  <section class="sec sec-grey fn" id="process" data-fn>
-    <div class="fn__sticky">
-      <div class="wrap fn__grid">
-        <div class="fn__l">
-          <p class="eb" data-rv><i></i>(04) How we work</p>
-          <h2 class="h2" data-hd><?= title('From attention|to *customers.*') ?></h2>
-          <p class="lead" data-rv>Every project runs the same five steps. You see where we are, and what each step added, in every report.</p>
-          <ol class="steps">
-            <?php foreach ($process as $i => $s): ?>
-              <li class="step" data-step>
-                <span class="step__n mono"><?= sprintf('%02d', $i + 1) ?></span>
-                <div><h3><?= e($s['title']) ?> <span class="chip mono"><?= e($s['when']) ?></span></h3><p><?= e($s['body']) ?></p></div>
-              </li>
-            <?php endforeach; ?>
-          </ol>
-        </div>
-
-        <div class="fn__r" data-rv>
-          <?php $in = [0, 7, 14, 21, 27]; // funnel wall inset (%) at the top of each band, plus the bottom ?>
-          <div class="funnel" data-funnel>
-            <?php foreach ($funnel_demo as $i => $f): ?>
-              <div class="band" style="--i:<?= $i ?>;--a:<?= $in[$i] ?>%;--b:<?= $in[$i + 1] ?>%" data-band data-val="<?= (int) $f['value'] ?>" tabindex="0">
-                <span class="band__shape"><span class="band__fill"></span></span>
-                <span class="band__in">
-                  <span class="chip mono"><b><?= sprintf('%02d', $i + 1) ?></b> <?= e($f['stage']) ?></span>
-                  <b class="band__v" data-band-v><?= number_format($f['value']) ?></b>
-                </span>
-                <span class="band__tip mono"><i class="live"></i><?= e($f['rate']) ?></span>
-              </div>
-            <?php endforeach; ?>
-            <canvas class="fn__cv" data-fn-cv aria-hidden="true"></canvas>
-          </div>
-          <p class="fn__note mono"><i class="live"></i>Example funnel · illustrative numbers</p>
-        </div>
-      </div>
-    </div>
-  </section>
+<?php require __DIR__ . '/includes/partials/funnel.php'; ?>
 
   <!-- ===================== RESULTS BAND ===================== -->
   <section class="sec sec-grad nm" id="results" data-nm>
@@ -477,37 +435,7 @@ require __DIR__ . '/includes/header.php';
     </div>
   </section>
 
-  <!-- ===================== FAQ ===================== -->
-  <section class="sec sec-light fq" id="faq">
-    <div class="wrap fq__grid">
-      <div class="fq__side">
-        <p class="eb" data-rv><i></i>(08) FAQ</p>
-        <h2 class="h2" data-hd><?= title('Questions,|*answered.*') ?></h2>
-        <div class="ask sec-dark" data-rv>
-          <p class="mono"><i class="ping"></i>Still unsure?</p>
-          <h3>Talk it through with us on a call.</h3>
-          <p>We look at your website, ads and socials with you and point out the quickest wins — you keep the advice either way.</p>
-          <a class="btn btn--solid btn--sm" href="#contact" data-mag><span class="btn__lb">Book a call</span><span class="btn__ic"><?= icon('calendar') ?></span></a>
-          <p class="ask__mail">Or write to <span class="selectable"><?= e($site['email']) ?></span></p>
-        </div>
-      </div>
-      <div class="fq__list" data-faq>
-        <span class="fq__rail" aria-hidden="true"><span data-faq-rail></span></span>
-        <?php foreach ($faqs as $i => $f): ?>
-          <div class="qa<?= $i ? '' : ' is-open' ?>" data-qa>
-            <span class="qa__dot" aria-hidden="true"></span>
-            <button class="qa__q" type="button" aria-expanded="<?= $i ? 'false' : 'true' ?>" aria-controls="qa-<?= $i ?>">
-              <span class="mono qa__n"><?= sprintf('%02d', $i + 1) ?></span>
-              <span class="qa__t"><?= e($f['q']) ?></span>
-              <span class="chip mono qa__tag"><?= e($f['tag']) ?></span>
-              <span class="qa__pl" aria-hidden="true"><i></i><i></i></span>
-            </button>
-            <div class="qa__a" id="qa-<?= $i ?>" role="region"><div><p><?= e($f['a']) ?></p></div></div>
-          </div>
-        <?php endforeach; ?>
-      </div>
-    </div>
-  </section>
+<?php $faq_list = $faqs; require __DIR__ . '/includes/partials/faq.php'; ?>
 
   <!-- ===================== VIDEO STORIES (3D) ===================== -->
   <section class="sec sec-dark vs" id="videos" data-vs>
@@ -585,59 +513,7 @@ require __DIR__ . '/includes/header.php';
     </div>
   </section>
 
-  <!-- ===================== CONTACT / CTA ===================== -->
-  <section class="sec sec-dark ct" id="contact">
-    <div class="ct__rings" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-    <div class="wrap ct__grid">
-      <div>
-        <p class="eb" data-rv><i></i>(10) Let’s talk</p>
-        <h2 class="ct__h" data-hd><?= title('Ready to|*grow?*') ?></h2>
-        <p class="lead" data-rv>Tell us about your business. We look at your website, ads and socials and come back with the quickest wins — whether we work together or not.</p>
-
-        <form class="form" action="/contact-submit.php" method="post" novalidate data-contact-form data-rv>
-          <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
-          <input type="hidden" name="ts" value="<?= time() ?>">
-          <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
-          <div class="form__row">
-            <label class="fld"><span class="sr-only">Name</span><input id="f-name" name="name" type="text" autocomplete="name" required maxlength="100" placeholder="Your name"></label>
-            <label class="fld"><span class="sr-only">Work email</span><?= icon('mail') ?><input id="f-email" name="email" type="email" autocomplete="email" required maxlength="150" placeholder="Work email"></label>
-          </div>
-          <div class="form__row">
-            <label class="fld"><span class="sr-only">Phone or WhatsApp</span><?= icon('phone') ?><input id="f-phone" name="phone" type="tel" autocomplete="tel" maxlength="30" placeholder="Phone / WhatsApp"></label>
-            <label class="fld fld--sel"><span class="sr-only">What do you need?</span>
-              <select id="f-need" name="services[]">
-                <option value="">What do you need?</option>
-                <?php foreach ($channels as $c): ?><option><?= e($c['title']) ?></option><?php endforeach; ?>
-                <option>Not sure yet</option>
-              </select>
-            </label>
-          </div>
-          <label class="fld fld--area"><span class="sr-only">About your business</span><textarea id="f-message" data-lenis-prevent name="message" rows="2" required maxlength="3000" placeholder="What do you sell, and what would you like to grow?"></textarea></label>
-          <div class="form__foot">
-            <button class="btn btn--solid" type="submit" data-mag><span class="btn__lb">Send message</span><span class="btn__ic"><?= icon('arrow-up') ?></span></button>
-            <p class="form__st mono" role="status" aria-live="polite" data-form-status><?php
-              if ($form_status === 'sent') echo 'Thanks — your message is on its way.';
-              elseif ($form_status === 'error') echo 'Something went wrong. Please email ' . e($site['email']) . '.';
-              else echo 'No spam. We reply by email or WhatsApp.';
-            ?></p>
-          </div>
-        </form>
-      </div>
-
-      <aside class="avail" data-rv>
-        <p class="mono"><i class="live"></i>Our time · Chandigarh, India</p>
-        <p class="avail__clk" data-clock>--:--:--</p>
-        <div class="avail__seg" aria-hidden="true"><?php for ($k = 0; $k < 9; $k++): ?><i style="--i:<?= $k ?>"></i><?php endfor; ?></div>
-        <p class="mono avail__mk"><?= e(implode(' · ', $site['markets'])) ?></p>
-        <ul class="avail__list">
-          <li><?= icon('mail') ?><span class="selectable"><?= e($site['email']) ?></span></li>
-          <?php foreach ($site['phones'] as $p): ?><li><?= icon('phone') ?><a href="tel:<?= e($p['tel']) ?>"><?= e($p['label']) ?></a></li><?php endforeach; ?>
-          <li><?= icon('whatsapp') ?><a href="https://wa.me/<?= e($site['whatsapp']) ?>" target="_blank" rel="noopener">Chat on WhatsApp</a></li>
-          <li><?= icon('pin') ?><span><?= e($site['address']['line1']) ?>, <?= e($site['address']['city']) ?>, <?= e($site['address']['country']) ?></span></li>
-        </ul>
-      </aside>
-    </div>
-  </section>
+<?php require __DIR__ . '/includes/partials/contact.php'; ?>
 
 </main>
 <?php require __DIR__ . '/includes/footer.php'; ?>

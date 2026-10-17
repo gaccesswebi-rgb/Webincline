@@ -580,6 +580,27 @@
   }
 
   /* ---------------- services accordion ---------------- */
+  /* The search-results mock: "your" result climbs from #5 to #3 to #1.
+     Returns a function that stops the climb. */
+  function serpClimb(box, play) {
+    const rows = $$('[data-row]', box);
+    const rank = $('[data-rank]', box);
+    const order = [0, 1, 2, 3, 4];
+    const place = () => rows.forEach((r, i) => r.style.setProperty('--i', order[i]));
+    const moveTo = (pos) => {
+      const from = order[4];
+      rows.forEach((r, i) => { if (i !== 4 && order[i] >= pos && order[i] < from) order[i]++; });
+      order[4] = pos;
+      place();
+      if (rank) rank.textContent = '#' + (pos + 1);
+    };
+    place();
+    if (rank) rank.textContent = '#5';
+    if (!play) return () => {};
+    const timers = [setTimeout(() => moveTo(2), 1200), setTimeout(() => moveTo(0), 2500)];
+    return () => timers.forEach(clearTimeout);
+  }
+
   function initServices() {
     // the side-by-side accordion needs 1280px; narrower screens get stacked panels (see CSS)
     const wide = () => window.matchMedia('(min-width: 1280px)').matches;
@@ -589,7 +610,7 @@
     const segs = $$('.sv__seg i');
     const idx = $('[data-sv-idx]');
     const name = $('[data-sv-name]');
-    let cur = 0, hoverT = 0, pauseUntil = 0, visible = false, serpTimers = [];
+    let cur = 0, hoverT = 0, pauseUntil = 0, visible = false, stopSerp = () => {};
 
     const setWidth = () => {
       if (!wide()) return;
@@ -598,24 +619,9 @@
     };
 
     const serp = (pn) => {
-      serpTimers.forEach(clearTimeout); serpTimers = [];
+      stopSerp();
       const box = $('[data-serp]', pn);
-      if (!box) return;
-      const rows = $$('[data-row]', box);
-      const rank = $('[data-rank]', box);
-      const order = [0, 1, 2, 3, 4];
-      const place = () => rows.forEach((r, i) => r.style.setProperty('--i', order[i]));
-      const moveTo = (pos) => {
-        const from = order[4];
-        rows.forEach((r, i) => { if (i !== 4 && order[i] >= pos && order[i] < from) order[i]++; });
-        order[4] = pos;
-        place();
-        if (rank) rank.textContent = '#' + (pos + 1);
-      };
-      place();
-      if (rank) rank.textContent = '#5';
-      if (!pn.classList.contains('is-open')) return;
-      serpTimers.push(setTimeout(() => moveTo(2), 1200), setTimeout(() => moveTo(0), 2500));
+      if (box) stopSerp = serpClimb(box, pn.classList.contains('is-open'));
     };
 
     const open = (i, user) => {
@@ -671,6 +677,121 @@
         open((cur + 1) % pns.length);
       }, 4800);
     }
+  }
+
+  /* ---------------- inner pages ---------------- */
+  // Services menu in the header: opens on hover with a mouse, or with the arrow button.
+  function initMega() {
+    const li = $('[data-mega]');
+    if (!li) return;
+    const btn = $('[data-mega-toggle]', li);
+    let t = 0;
+    const isOpen = () => li.classList.contains('is-open');
+    const set = (open) => {
+      clearTimeout(t);
+      li.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', String(open));
+    };
+    btn.addEventListener('click', () => set(!isOpen()));
+    if (fine) {
+      li.addEventListener('pointerenter', () => { clearTimeout(t); t = setTimeout(() => set(true), 90); });
+      li.addEventListener('pointerleave', () => { clearTimeout(t); t = setTimeout(() => set(false), 220); });
+    }
+    li.addEventListener('focusout', (e) => { if (!li.contains(e.relatedTarget)) set(false); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen()) { set(false); btn.focus(); } });
+    document.addEventListener('click', (e) => { if (isOpen() && !li.contains(e.target)) set(false); });
+    window.addEventListener('scroll', () => { if (isOpen() && !li.matches(':hover')) set(false); }, { passive: true });
+  }
+
+  // Page hero search card: types a search, then "your" result climbs to #1. Loops while on screen.
+  function initPageHero() {
+    const card = $('[data-ph-serp]');
+    if (!card || !motion) return;
+    const q = $('[data-ph-q]', card);
+    const step = $('[data-ph-step]', card);
+    const rows = $$('[data-ph-row]', card);
+    const you = $('[data-ph-you]', card);
+    const rank = $('[data-ph-rank]', card);
+    const others = rows.filter((r) => r !== you);
+    const SEARCHES = [
+      ['plumber near me', ['homeadvisor.com', 'yelp.com › plumbers', 'angi.com', 'reddit.com › r/homeowners']],
+      ['study abroad consultants', ['idp.com', 'leverageedu.com', 'shiksha.com', 'quora.com › study-abroad']],
+      ['robot lawn mower australia', ['bunnings.com.au', 'productreview.com.au', 'choice.com.au', 'amazon.com.au']],
+    ];
+    let k = 0, timers = [], on = false;
+    const later = (f, ms) => timers.push(setTimeout(f, ms));
+    const placeYou = (pos) => {
+      let j = 0;
+      others.forEach((r) => { if (j === pos) j++; r.style.setProperty('--i', j); j++; });
+      you.style.setProperty('--i', pos);
+      rank.textContent = '#' + (pos + 1);
+    };
+    const run = () => {
+      timers.forEach(clearTimeout); timers = [];
+      const [text, domains] = SEARCHES[k % SEARCHES.length];
+      step.textContent = 'Search ' + (k % SEARCHES.length + 1) + ' of ' + SEARCHES.length;
+      card.classList.remove('is-done');
+      others.forEach((r, i) => { $('[data-ph-d]', r).textContent = domains[i]; });
+      placeYou(4);
+      q.textContent = '';
+      [...text].forEach((ch, i) => later(() => { q.textContent += ch; }, 300 + i * 55));
+      const typed = 300 + text.length * 55;
+      later(() => placeYou(2), typed + 900);
+      later(() => placeYou(0), typed + 2000);
+      later(() => card.classList.add('is-done'), typed + 2600);
+      later(() => { k++; run(); }, typed + 6200);
+    };
+    new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !on) { on = true; run(); }
+      else if (!e.isIntersecting && on) { on = false; timers.forEach(clearTimeout); timers = []; }
+    }).observe(card);
+  }
+
+  // Services hub cards: each mock-up plays when its card scrolls in, and again on hover.
+  function initSvcGrid() {
+    const cards = $$('[data-sc]');
+    if (!cards.length) return;
+    cards.forEach((card) => {
+      let stop = () => {};
+      const play = () => {
+        stop();
+        card.classList.remove('is-live');
+        void card.offsetWidth; // restart the CSS animations
+        card.classList.add('is-live');
+        const box = $('[data-serp]', card);
+        if (box) stop = serpClimb(box, motion);
+      };
+      inView(card, play, { threshold: 0.35 });
+      if (fine) card.addEventListener('pointerenter', play);
+    });
+    // "Ask about …" buttons pick that service in the contact form
+    $$('[data-pick]').forEach((a) => a.addEventListener('click', () => {
+      const sel = $('#f-need');
+      if (sel) sel.value = a.dataset.pick;
+    }));
+  }
+
+  // Markets list: local time in each market, with a lit dot during office hours there.
+  function initMarkets() {
+    const box = $('[data-mk]');
+    if (!box) return;
+    const fmt = (tz, o) => new Intl.DateTimeFormat('en-GB', Object.assign({ timeZone: tz }, o));
+    const hm = { hour: '2-digit', minute: '2-digit', hour12: false };
+    const rows = $$('[data-tz]', box).map((li) => ({ li, out: $('[data-mk-t]', li), time: fmt(li.dataset.tz, hm), day: fmt(li.dataset.tz, { weekday: 'short' }) }));
+    const home = $('[data-mk-home]', box);
+    const homeTime = fmt('Asia/Kolkata', hm);
+    const tick = () => {
+      const d = new Date();
+      if (home) home.textContent = homeTime.format(d);
+      rows.forEach((r) => {
+        const t = r.time.format(d);
+        const h = parseInt(t, 10);
+        r.out.textContent = t;
+        r.li.classList.toggle('is-open', h >= 9 && h < 18 && !/Sat|Sun/.test(r.day.format(d)));
+      });
+    };
+    tick();
+    setInterval(tick, 20000);
   }
 
   /* ---------------- case studies ---------------- */
@@ -1397,7 +1518,9 @@
   initMagnetic();
   initReveals();
   initHero();
-  const later = [initForm, initServices, initRadar, initCrowd, initWork, initFunnel, initBoard, initTeam, initReviews, initVideos, initFaq, initClocks, initWordmark];
+  initMega();
+  initPageHero();
+  const later = [initForm, initServices, initSvcGrid, initMarkets, initRadar, initCrowd, initWork, initFunnel, initBoard, initTeam, initReviews, initVideos, initFaq, initClocks, initWordmark];
   const idle = window.requestIdleCallback || ((f) => setTimeout(f, 16));
   const next = () => {
     const f = later.shift();

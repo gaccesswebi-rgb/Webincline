@@ -18,12 +18,29 @@ function asset(string $path): string
     return '/assets/' . $path . '?v=' . $version;
 }
 
-/** Link to an internal page only once that page exists; otherwise null. */
+/** Path of the page being shown, e.g. "/services". */
+function current_path(): string
+{
+    $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    return $path === '/' ? '/' : rtrim($path, '/');
+}
+
+/** Link to an internal page only once that page exists (see routes.php); otherwise null. */
 function page_url(string $path): ?string
 {
-    $file = ROOT_DIR . rtrim($path, '/') . '.php';
-    $index = ROOT_DIR . rtrim($path, '/') . '/index.php';
-    return (is_file($file) || is_file($index)) ? $path : null;
+    return isset(ROUTES[$path]) ? $path : null;
+}
+
+/** A section of the home page: "#work" on the home page, "/#work" everywhere else. */
+function anchor(string $id): string
+{
+    return (current_path() === '/' ? '' : '/') . '#' . $id;
+}
+
+/** The page at $path once it exists, or $fallback until then. */
+function link_or(string $path, string $fallback): string
+{
+    return page_url($path) ?? $fallback;
 }
 
 function csrf_token(): string
@@ -55,6 +72,7 @@ function icon(string $name, string $class = 'icon'): string
 {
     $paths = [
         'arrow'     => '<path d="M5 12h14M13 6l6 6-6 6"/>',
+        'chev'      => '<path d="m6 9 6 6 6-6"/>',
         'search'    => '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/>',
         'heart'     => '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
         'chat'      => '<path d="M5 18.5V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8z"/>',

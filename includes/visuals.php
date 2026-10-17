@@ -108,6 +108,23 @@ function channel_visual(string $key): string
               </div>
             </div>
             <?php break;
+
+        case 'email': ?>
+            <div class="ui ui--email">
+              <div class="ui-mail">
+                <div class="ui-mail__head"><span class="ui-av"></span><span><b>yourbrand</b><small>to you · 9:41</small></span><span class="ui-mail__tag mono">Flow 2 of 3</span></div>
+                <p class="ui-mail__sub">Still thinking it over? Your cart is saved.</p>
+                <span class="ui-mail__ln"></span><span class="ui-mail__ln ui-mail__ln--s"></span>
+                <span class="ui-mail__btn">Complete my order</span>
+              </div>
+              <div class="ui-flow">
+                <?php foreach (['Welcome', 'Cart', 'Win-back'] as $i => $step): ?>
+                  <span class="ui-node" style="--d:<?= .5 + $i * .55 ?>s"><i><?= icon('mail') ?></i><?= e($step) ?></span>
+                <?php endforeach; ?>
+              </div>
+              <p class="ui-toast ui-toast--b"><span class="ui-toast__i"><?= icon('check') ?></span>Order recovered · 2 min ago</p>
+            </div>
+            <?php break;
     }
     return (string) ob_get_clean();
 }

@@ -7,10 +7,11 @@
 
 declare(strict_types=1);
 
-/* Six channels that together cover all twelve services. */
+/* The seven channels on the homepage accordion; 'pillar' is the service page each one opens (includes/services.php). */
 $channels = [
     [
         'slug'     => 'seo',
+        'pillar'   => 'seo',
         'theme'    => 'fog',
         'title'    => 'SEO & AI search',
         'short'    => 'SEO',
@@ -22,6 +23,7 @@ $channels = [
     ],
     [
         'slug'     => 'paid-ads',
+        'pillar'   => 'paid-ads',
         'theme'    => 'ink',
         'title'    => 'Paid ads',
         'short'    => 'Ads',
@@ -33,6 +35,7 @@ $channels = [
     ],
     [
         'slug'     => 'social-media',
+        'pillar'   => 'social-media',
         'theme'    => 'cloud',
         'title'    => 'Social & influencers',
         'short'    => 'Social',
@@ -44,6 +47,7 @@ $channels = [
     ],
     [
         'slug'     => 'web-development',
+        'pillar'   => 'web-design',
         'theme'    => 'orange',
         'title'    => 'Websites & stores',
         'short'    => 'Web',
@@ -55,6 +59,7 @@ $channels = [
     ],
     [
         'slug'     => 'crm',
+        'pillar'   => 'crm',
         'theme'    => 'violet',
         'title'    => 'CRM',
         'short'    => 'CRM',
@@ -66,6 +71,7 @@ $channels = [
     ],
     [
         'slug'     => 'ai-automation',
+        'pillar'   => 'automation',
         'theme'    => 'pink',
         'title'    => 'Automation & AI',
         'short'    => 'AI',
@@ -74,6 +80,18 @@ $channels = [
         'includes' => ['AI chat & WhatsApp agents', 'Email & WhatsApp journeys', 'Business process automation', 'App integrations'],
         'proof'    => 'Leads answered 24/7',
         'visual'   => 'ai',
+    ],
+    [
+        'slug'     => 'email-marketing',
+        'pillar'   => 'email-marketing',
+        'theme'    => 'blue',
+        'title'    => 'Email marketing',
+        'short'    => 'Email',
+        'line'     => 'Emails that sell while you sleep.',
+        'body'     => 'Welcome, abandoned-cart and win-back flows plus regular campaigns on Klaviyo, Brevo, Mailchimp, HubSpot or Zoho Campaigns — designed, written and tested.',
+        'includes' => ['Welcome & abandoned-cart flows', 'Campaign design & copy', 'List growth & segments', 'A/B testing', 'Deliverability checks'],
+        'proof'    => 'Flows that run on their own',
+        'visual'   => 'email',
     ],
 ];
 

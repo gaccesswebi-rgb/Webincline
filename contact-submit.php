@@ -14,6 +14,12 @@ session_start();
 
 $wants_json = ($_SERVER['HTTP_ACCEPT'] ?? '') === 'application/json';
 
+// Send plain form posts back to the page they came from (a local path only).
+$back = (string) ($_POST['back'] ?? '/');
+if (!preg_match('#^/[a-z0-9/-]*$#', $back) || str_starts_with($back, '//')) {
+    $back = '/';
+}
+
 function respond(bool $ok, string $message, bool $json): never
 {
     if ($json) {
@@ -21,7 +27,7 @@ function respond(bool $ok, string $message, bool $json): never
         header('Content-Type: application/json');
         echo json_encode(['ok' => $ok, 'message' => $message]);
     } else {
-        header('Location: /?status=' . ($ok ? 'sent' : 'error') . '#contact', true, 303);
+        header('Location: ' . $GLOBALS['back'] . '?status=' . ($ok ? 'sent' : 'error') . '#contact', true, 303);
     }
     exit;
 }

@@ -1,5 +1,18 @@
-# Block direct access to PHP includes and stored leads.
-RedirectMatch 404 ^/(includes|storage)(/|$)
+# Block direct access to PHP includes, page templates and stored leads.
+RedirectMatch 404 ^/(includes|storage|pages)(/|$)
+Options -Indexes
+
+# Clean addresses (/services/seo): anything that is not a real file goes to
+# the router, which also drops trailing slashes and shows the 404 page.
+DirectoryIndex index.php
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{THE_REQUEST} \s/index\.php[\s?]
+  RewriteRule ^index\.php$ / [R=301,L]
+  RewriteCond %{REQUEST_URI} !^/$
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^ router.php [L,QSA]
+</IfModule>
 
 # Media types some hosts do not know yet (video captions, web fonts).
 <IfModule mod_mime.c>

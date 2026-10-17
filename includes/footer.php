@@ -1,4 +1,4 @@
-<?php /** @var array $site @var array $channels */ ?>
+<?php /** @var array $site @var array $services */ $book_href = link_or('/contact/book-a-call', anchor('contact')); ?>
 <footer class="ft sec-ink" data-ft>
   <div class="wrap ft__top">
     <div class="ft__brand">
@@ -8,22 +8,22 @@
       </a>
       <p><?= e(SITE_TAGLINE) ?> SEO, ads, social, websites, CRM and AI automation that bring the right people to your door.</p>
       <p class="note"><i class="live"></i>Taking new projects in 9 markets</p>
-      <a class="btn btn--solid btn--sm" href="#contact" data-mag><span class="btn__lb">Book a strategy call</span><span class="btn__ic"><?= icon('calendar') ?></span></a>
+      <a class="btn btn--solid btn--sm" href="<?= e($book_href) ?>" data-mag><span class="btn__lb">Book a strategy call</span><span class="btn__ic"><?= icon('calendar') ?></span></a>
     </div>
 
     <nav class="ft__col" aria-label="Services">
       <p class="mono">Services</p>
-      <ul><?php foreach ($channels as $i => $c): ?><li><a href="#services" data-goto-channel="<?= $i ?>"><?= e($c['title']) ?></a></li><?php endforeach; ?></ul>
+      <ul><?php foreach ($services as $slug => $s): ?><li><a href="<?= e(link_or(service_path($slug), link_or('/services', anchor('services')) . (page_url('/services') ? '#' . $slug : ''))) ?>"><?= e($s['name']) ?></a></li><?php endforeach; ?></ul>
     </nav>
     <nav class="ft__col" aria-label="Company">
       <p class="mono">Company</p>
       <ul>
-        <li><a href="#work">Case studies</a></li>
-        <li><a href="#process">How we work</a></li>
-        <li><a href="#team">Team</a></li>
-        <li><a href="#insights">Insights</a></li>
-        <li><a href="#faq">FAQ</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="<?= e(link_or('/work', anchor('work'))) ?>">Case studies</a></li>
+        <li><a href="<?= e(anchor('process')) ?>">How we work</a></li>
+        <li><a href="<?= e(link_or('/about', anchor('team'))) ?>">About us</a></li>
+        <li><a href="<?= e(link_or('/blog', anchor('insights'))) ?>">Blog</a></li>
+        <?php if (page_url('/careers')): ?><li><a href="/careers">Careers</a></li><?php endif; ?>
+        <li><a href="<?= e(link_or('/contact', anchor('contact'))) ?>">Contact</a></li>
       </ul>
     </nav>
     <div class="ft__col">

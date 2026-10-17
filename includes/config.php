@@ -43,10 +43,10 @@ $site = [
     'markets' => ['India', 'Canada', 'USA', 'UK', 'Australia', 'Europe', 'Singapore', 'South Africa', 'Africa'],
 ];
 
+// Main menu. Until a page is built, its link goes to the matching homepage section.
 $nav = [
-    ['label' => 'Services', 'href' => '#services'],
-    ['label' => 'Work',     'href' => '#work'],
-    ['label' => 'Process',  'href' => '#process'],
-    ['label' => 'Team',     'href' => '#team'],
-    ['label' => 'Insights', 'href' => '#insights'],
+    ['label' => 'Services', 'path' => '/services', 'anchor' => 'services'],
+    ['label' => 'Work',     'path' => '/work',     'anchor' => 'work'],
+    ['label' => 'About',    'path' => '/about',    'anchor' => 'team'],
+    ['label' => 'Blog',     'path' => '/blog',     'anchor' => 'insights'],
 ];
