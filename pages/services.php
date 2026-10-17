@@ -8,9 +8,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/bootstrap.php';
 
-$page_title       = 'Digital Marketing Services: SEO, Ads, Social, Web, CRM & Email | Webincline';
-$page_description = 'Seven channels from one team in Chandigarh: SEO and AI search, paid ads, social media, web design, CRM, automation and email marketing, planned together and reported in plain numbers.';
+$page_title       = 'Digital Marketing Services: SEO, Ads, Web & CRM | Webincline';
+$page_description = 'SEO, paid ads, social media, websites, CRM, automation and email marketing from one Chandigarh team, planned together and reported in plain numbers.';
 $breadcrumbs      = [['Home', '/'], ['Services', '/services']];
+$page_sections    = ['process', 'faq', 'contact'];   // sections this page has, so header and footer links stay here
 
 $page_schema = [[
     '@context'        => 'https://schema.org',
@@ -23,8 +24,8 @@ $page_schema = [[
             '@type'       => 'Service',
             'name'        => $s['name'],
             'description' => $s['body'],
-            'url'         => SITE_URL . link_or(service_path($slug), '/services#' . $slug),
-            'provider'    => ['@type' => 'ProfessionalService', 'name' => SITE_NAME, 'url' => SITE_URL],
+            'url'         => SITE_URL . service_link($slug),
+            'provider'    => ['@id' => SITE_URL . '/#org'],
         ],
     ], array_keys($services), $services, array_keys(array_keys($services))),
 ]];
@@ -34,10 +35,10 @@ $service_faqs = [
     ['q' => 'Can I hire you for just one service?', 'tag' => 'Getting started', 'a' => 'Yes. Most clients start with one channel and add more once it pays for itself. Each channel is reported on its own, so you can see what every one of them returns.'],
     ['q' => 'Do you lock clients into long contracts?', 'tag' => 'Working together', 'a' => 'No. We would rather keep you with results than with paperwork. We agree the scope and notice period with you before we start.'],
     ['q' => 'Do you work with businesses outside India?', 'tag' => 'Working together', 'a' => 'Yes. Our team is in Chandigarh and works with clients in India, Canada, the USA, the UK, the UAE, Australia, Singapore, South Africa, the rest of Africa and Europe, on calls, WhatsApp and email that fit your working hours.'],
-    ['q' => 'How long until I see results?', 'tag' => 'Results', 'a' => 'Paid ads can bring leads within the first few weeks. SEO takes longer: in our case studies, clients reached Google’s top 10 for their main keywords in three to six months.'],
-    ['q' => 'Can you build our website and market it too?', 'tag' => 'Services', 'a' => 'Yes. We design and build the site, then run SEO, ads, social and email on top of it, so one team owns the results. Every website includes 6 months of free support.'],
+    ['q' => 'What do you need from us to start?', 'tag' => 'Getting started', 'a' => 'Access to your website, ad accounts and analytics, a short call about your customers and margins, and one person who can approve the work. We take it from there.'],
+    ['q' => 'Can you take over an existing ad account or website?', 'tag' => 'Working together', 'a' => 'Yes. We start with an audit of the account or site as it is, keep what works, and agree the fixes with you before we change anything.'],
     ['q' => 'Which platforms do you work with?', 'tag' => 'Services', 'a' => 'Google, Meta, Amazon, ChatGPT, LinkedIn, TikTok and YouTube for ads. Shopify, WordPress, Wix, Framer, Squarespace and Webflow for websites. Zoho, GoHighLevel, HubSpot, Salesforce and Microsoft Dynamics for CRM. Zapier, Make, ManyChat and n8n for automation. Klaviyo, Brevo, Mailchimp, HubSpot and Zoho Campaigns for email.'],
-    ['q' => 'How do you report results?', 'tag' => 'Results', 'a' => 'Regular reports with the numbers that matter for each channel (traffic, rankings, leads, cost per lead and sales), plus what we changed and what comes next.'],
+    ['q' => 'Can you work alongside our in-house team or another agency?', 'tag' => 'Working together', 'a' => 'Yes. Many clients keep some channels in-house. We agree who owns which channel and keep the numbers in one shared report.'],
 ];
 
 $book = link_or('/contact/book-a-call', '#contact');
@@ -68,7 +69,7 @@ require __DIR__ . '/../includes/header.php';
       </div>
 
       <div class="ph__card is-done" data-ph-serp aria-hidden="true">
-        <div class="phs__top mono"><span><i class="live"></i>Live · Google search</span><span data-ph-step>Result 1 of 3</span></div>
+        <div class="phs__top mono"><span><i class="live"></i>Live · Google search</span><span data-ph-step>Search 1 of 3</span></div>
         <div class="ui-q"><?= icon('search') ?><span data-ph-q>plumber near me</span><i class="phs__caret"></i></div>
         <p class="ui-meta mono">About 2,140,000 results · 0.42 s</p>
         <div class="phs__res">
@@ -195,7 +196,7 @@ require __DIR__ . '/../includes/header.php';
               <li class="mk" data-tz="<?= e($m['tz']) ?>">
                 <span class="mk__c mono"><?= e($m['code']) ?></span>
                 <span class="mk__n"><b><?= e($m['name']) ?></b><?php if ($m['clients']): ?><small><?= e($m['clients']) ?></small><?php endif; ?></span>
-                <span class="mk__t mono"><i class="mk__dot" title="Office hours there"></i><span data-mk-t>--:--</span></span>
+                <span class="mk__t mono"><i class="mk__dot" aria-hidden="true"></i><span data-mk-t>--:--</span><span class="sr-only" data-mk-st></span></span>
               </li>
             <?php endforeach; ?>
           </ul>

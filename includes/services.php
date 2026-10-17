@@ -164,8 +164,17 @@ $markets = [
     ['code' => 'EU', 'name' => 'Europe',         'slug' => 'europe',       'tz' => 'Europe/Berlin',       'clients' => ''],
 ];
 
+// One list of markets for the whole site: counts, the contact card and the schema read it.
+$site['markets'] = array_column($markets, 'name');
+
 /** URL of a main service or sub-service page. */
 function service_path(string $pillar, ?string $sub = null): string
 {
     return '/services/' . $pillar . ($sub ? '/' . $sub : '');
+}
+
+/** Link to a service: its own page once built, else its card on /services, else the homepage section. */
+function service_link(string $pillar, ?string $sub = null): string
+{
+    return link_or(service_path($pillar, $sub), page_url('/services') ? '/services#' . $pillar : anchor('services'));
 }

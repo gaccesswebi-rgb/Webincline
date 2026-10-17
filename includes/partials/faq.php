@@ -36,13 +36,13 @@ $faq_schema = [
         <?php foreach ($faq_list as $i => $f): ?>
           <div class="qa<?= $i ? '' : ' is-open' ?>" data-qa>
             <span class="qa__dot" aria-hidden="true"></span>
-            <button class="qa__q" type="button" aria-expanded="<?= $i ? 'false' : 'true' ?>" aria-controls="qa-<?= $i ?>">
-              <span class="mono qa__n"><?= sprintf('%02d', $i + 1) ?></span>
+            <button class="qa__q" type="button" id="qa-q-<?= $i ?>" aria-expanded="<?= $i ? 'false' : 'true' ?>" aria-controls="qa-<?= $i ?>">
+              <span class="mono qa__n" aria-hidden="true"><?= sprintf('%02d', $i + 1) ?></span>
               <span class="qa__t"><?= e($f['q']) ?></span>
-              <span class="chip mono qa__tag"><?= e($f['tag']) ?></span>
+              <span class="chip mono qa__tag" aria-hidden="true"><?= e($f['tag']) ?></span>
               <span class="qa__pl" aria-hidden="true"><i></i><i></i></span>
             </button>
-            <div class="qa__a" id="qa-<?= $i ?>" role="region"><div><p><?= e($f['a']) ?></p></div></div>
+            <div class="qa__a" id="qa-<?= $i ?>" role="region" aria-labelledby="qa-q-<?= $i ?>"><div><p><?= e($f['a']) ?></p></div></div>
           </div>
         <?php endforeach; ?>
       </div>

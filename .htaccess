@@ -1,5 +1,8 @@
-# Block direct access to PHP includes, page templates and stored leads.
+# Block direct access to PHP includes, page templates, stored leads, and
+# dotfiles such as .git (in case the site is deployed with git).
 RedirectMatch 404 ^/(includes|storage|pages)(/|$)
+RedirectMatch 404 /\.(?!well-known/)
+RedirectMatch 404 ^/README\.md$
 Options -Indexes
 
 # Clean addresses (/services/seo): anything that is not a real file goes to

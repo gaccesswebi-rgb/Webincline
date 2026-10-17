@@ -16,10 +16,10 @@ function channel_visual(string $key): string
               <p class="ui-meta mono">About 2,140,000 results · 0.38 s</p>
               <div class="ui-res">
                 <?php foreach (['marketplace.com', 'reviews-site.com', 'mowerhub.com.au', 'bigstore.com', 'yourbrand.com.au'] as $i => $site): ?>
-                  <div class="ui-r<?= $i === 4 ? ' is-you' : '' ?>" data-row style="--i:<?= $i ?>">
+                  <div class="ui-r<?= $i === 4 ? ' is-you' : '' ?>" data-row style="--i:<?= $i === 4 ? 0 : $i + 1 ?>"><?php /* end state (#1) until the script replays the climb */ ?>
                     <span class="ui-fav"></span>
                     <span class="ui-rt"><b><?= e($site) ?></b><i></i></span>
-                    <?php if ($i === 4): ?><span class="ui-rank mono" data-rank>#5</span><?php endif; ?>
+                    <?php if ($i === 4): ?><span class="ui-rank mono" data-rank>#1</span><?php endif; ?>
                   </div>
                 <?php endforeach; ?>
               </div>

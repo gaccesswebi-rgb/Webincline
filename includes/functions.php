@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 const ROOT_DIR = __DIR__ . '/..';
 
+// Some PHP installs (Ubuntu's php-cli, the Windows zip) leave out mbstring.
+if (!function_exists('mb_substr')) {
+    function mb_substr(string $string, int $start, ?int $length = null, ?string $encoding = null): string
+    {
+        return implode('', array_slice(preg_split('//u', $string, -1, PREG_SPLIT_NO_EMPTY) ?: [], $start, $length));
+    }
+}
+
 /** Escape text for HTML output. */
 function e(string $value): string
 {
@@ -31,10 +39,14 @@ function page_url(string $path): ?string
     return isset(ROUTES[$path]) ? $path : null;
 }
 
-/** A section of the home page: "#work" on the home page, "/#work" everywhere else. */
+/**
+ * A page section: "#contact" on the home page and on pages that list the section in
+ * $page_sections (set before header.php), "/#contact" (the homepage's) everywhere else.
+ */
 function anchor(string $id): string
 {
-    return (current_path() === '/' ? '' : '/') . '#' . $id;
+    $here = current_path() === '/' || in_array($id, $GLOBALS['page_sections'] ?? [], true);
+    return ($here ? '' : '/') . '#' . $id;
 }
 
 /** The page at $path once it exists, or $fallback until then. */

@@ -10,6 +10,15 @@ $ct_eb    = $ct_eb ?? '(10) Let’s talk';
 $ct_title = $ct_title ?? 'Ready to|*grow?*';
 $ct_lead  = $ct_lead ?? 'Tell us about your business. We look at your website, ads and socials and come back with the quickest wins — whether we work together or not.';
 $ct_pick  = $ct_pick ?? '';
+// Messages for a plain (no-JS) form post, named by contact-submit.php's ?status=
+$ct_status = [
+    'sent'    => 'Thanks — your message is on its way.',
+    'invalid' => 'Please add your name, a valid email and a short message.',
+    'wait'    => 'Please wait 30 seconds before sending another message.',
+    'expired' => 'Your session expired. Please send the form again.',
+    'error'   => 'Something went wrong. Please email ' . $site['email'] . '.',
+];
+$ct_known = is_string($form_status) && isset($ct_status[$form_status]);
 ?>
   <!-- ===================== CONTACT / CTA ===================== -->
   <section class="sec sec-dark ct" id="contact">
@@ -42,11 +51,7 @@ $ct_pick  = $ct_pick ?? '';
           <label class="fld fld--area"><span class="sr-only">About your business</span><textarea id="f-message" data-lenis-prevent name="message" rows="2" required maxlength="3000" placeholder="What do you sell, and what would you like to grow?"></textarea></label>
           <div class="form__foot">
             <button class="btn btn--solid" type="submit" data-mag><span class="btn__lb">Send message</span><span class="btn__ic"><?= icon('arrow-up') ?></span></button>
-            <p class="form__st mono" role="status" aria-live="polite" data-form-status><?php
-              if ($form_status === 'sent') echo 'Thanks — your message is on its way.';
-              elseif ($form_status === 'error') echo 'Something went wrong. Please email ' . e($site['email']) . '.';
-              else echo 'No spam. We reply by email or WhatsApp.';
-            ?></p>
+            <p class="form__st mono<?= $ct_known ? ($form_status === 'sent' ? ' is-ok' : ' is-bad') : '' ?>" id="form-status" role="status" aria-live="polite" data-form-status><?= e($ct_known ? $ct_status[$form_status] : 'No spam. We reply by email or WhatsApp.') ?></p>
           </div>
         </form>
       </div>

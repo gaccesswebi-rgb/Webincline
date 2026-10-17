@@ -40,7 +40,7 @@ $site = [
         ['value' => 9,   'suffix' => '',  'label' => 'Markets we work in'],
         ['value' => 6,   'suffix' => ' mo', 'label' => 'Free support on every website'],
     ],
-    'markets' => ['India', 'Canada', 'USA', 'UK', 'Australia', 'Europe', 'Singapore', 'South Africa', 'Africa'],
+    // 'markets' is filled from the markets list in includes/services.php
 ];
 
 // Main menu. Until a page is built, its link goes to the matching homepage section.

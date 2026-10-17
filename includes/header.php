@@ -5,15 +5,17 @@
  * $breadcrumbs ([[name, path], ...]) and $page_schema (extra JSON-LD objects).
  */
 $page_title       = $page_title ?? SITE_NAME . ' — ' . SITE_TAGLINE;
-$page_description = $page_description ?? 'Webincline is a digital marketing agency in Chandigarh running SEO, Google & Meta ads, social media, websites, CRM and AI automation for brands in India, Canada, the USA, the UK, Australia and beyond.';
+$page_description = $page_description ?? 'Digital marketing agency in Chandigarh: SEO, Google and Meta ads, social media, websites, CRM and AI automation for brands in India, Canada, the USA and beyond.';
 $canonical        = SITE_URL . current_path();
 $is_home          = current_path() === '/';
 $book_href        = link_or('/contact/book-a-call', anchor('contact'));
-$csrf             = csrf_token();   // the contact form needs the session before any output
+// Pages with the contact form start the session here, before any output.
+$csrf             = in_array('contact', $page_sections ?? [], true) ? csrf_token() : null;
 
 $org_schema = [
     '@context'   => 'https://schema.org',
     '@type'      => 'ProfessionalService',
+    '@id'        => SITE_URL . '/#org',
     'name'       => SITE_NAME,
     'slogan'     => SITE_TAGLINE,
     'url'        => SITE_URL,
@@ -53,14 +55,16 @@ $schemas = array_merge($schemas, $page_schema ?? []);
 <meta name="description" content="<?= e($page_description) ?>">
 <?php if (!empty($noindex)): ?><meta name="robots" content="noindex">
 <?php endif; ?>
-<link rel="canonical" href="<?= e($canonical) ?>">
+<?php if (empty($noindex)): ?><link rel="canonical" href="<?= e($canonical) ?>">
+<?php endif; ?>
 <meta name="theme-color" content="#111111">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="<?= e(SITE_NAME) ?>">
 <meta property="og:title" content="<?= e($page_title) ?>">
 <meta property="og:description" content="<?= e($page_description) ?>">
-<meta property="og:url" content="<?= e($canonical) ?>">
+<?php if (empty($noindex)): ?><meta property="og:url" content="<?= e($canonical) ?>">
+<?php endif; ?>
 <meta property="og:image" content="<?= e(SITE_URL) ?>/assets/img/brand/icon-512.png">
 <meta name="twitter:card" content="summary">
 
@@ -107,14 +111,14 @@ $schemas = array_merge($schemas, $page_schema ?? []);
             <a href="<?= e($href) ?>"<?= $act ? ' class="is-act" aria-current="page"' : '' ?>><?= e($item['label']) ?></a>
             <?php if ($mega): ?>
               <button class="hd__more" type="button" aria-expanded="false" aria-controls="mega" data-mega-toggle><span class="sr-only">All services</span><?= icon('chev') ?></button>
-              <div class="mega" id="mega">
+              <div class="mega" id="mega" data-lenis-prevent>
                 <div class="mega__in">
-                  <?php foreach ($services as $slug => $s): $hub = link_or('/services', anchor('services')) . (page_url('/services') ? '#' . $slug : ''); ?>
+                  <?php foreach ($services as $slug => $s): ?>
                     <div class="mega__col">
-                      <a class="mega__h" href="<?= e(link_or(service_path($slug), $hub)) ?>"><span class="mega__dot mega__dot--<?= e($s['theme']) ?>"></span><?= e($s['name']) ?></a>
+                      <a class="mega__h" href="<?= e(service_link($slug)) ?>"><span class="mega__dot mega__dot--<?= e($s['theme']) ?>"></span><?= e($s['name']) ?></a>
                       <ul>
                         <?php foreach ($s['subs'] as $sub => $x): ?>
-                          <li><a href="<?= e(link_or(service_path($slug, $sub), $hub)) ?>"><?= e($x['title']) ?></a></li>
+                          <li><a href="<?= e(service_link($slug, $sub)) ?>"><?php if (strlen($x['title']) <= 4 && !empty($x['long'])): ?><abbr title="<?= e($x['long']) ?>"><?= e($x['title']) ?></abbr><?php else: ?><?= e($x['title']) ?><?php endif; ?></a></li>
                         <?php endforeach; ?>
                       </ul>
                     </div>
@@ -149,7 +153,7 @@ $schemas = array_merge($schemas, $page_schema ?? []);
         <li><a href="<?= e(link_or($item['path'], anchor($item['anchor']))) ?>"><span class="mono"><?= sprintf('%02d', $i + 1) ?></span><?= e($item['label']) ?></a>
           <?php if ($item['path'] === '/services' && page_url('/services')): ?>
             <ul class="mm__sub">
-              <?php foreach ($services as $slug => $s): ?><li><a href="<?= e(link_or(service_path($slug), '/services#' . $slug)) ?>"><?= e($s['name']) ?></a></li><?php endforeach; ?>
+              <?php foreach ($services as $slug => $s): ?><li><a href="<?= e(service_link($slug)) ?>"><?= e($s['name']) ?></a></li><?php endforeach; ?>
             </ul>
           <?php endif; ?>
         </li>

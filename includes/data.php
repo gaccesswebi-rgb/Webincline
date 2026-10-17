@@ -298,10 +298,10 @@ $team = [
 ];
 
 $faqs = [
-    ['q' => 'Which countries do you work with?', 'tag' => 'General', 'a' => 'India, Canada, the USA, the UK, Australia, Europe, Singapore, South Africa and the rest of Africa. Our team is in Chandigarh and works across time zones on calls, WhatsApp and email.'],
+    ['q' => 'Which countries do you work with?', 'tag' => 'General', 'a' => 'India, Canada, the USA, the UK, the UAE, Australia, Singapore, South Africa, the rest of Africa and Europe. Our team is in Chandigarh and works across time zones on calls, WhatsApp and email.'],
     ['q' => 'How long until I see results?', 'tag' => 'General', 'a' => 'Paid ads can bring leads within the first few weeks. SEO takes longer — in our case studies, clients went from no rankings to Google’s top 10 in three to four months.'],
     ['q' => 'Can you build our website and market it too?', 'tag' => 'Services', 'a' => 'Yes. We design and build the site, then run SEO, ads and social on top of it, so one team owns the results. Every website includes 6 months of free support.'],
-    ['q' => 'Which CRMs do you work with?', 'tag' => 'Services', 'a' => 'Zoho CRM, HubSpot and GoHighLevel. We set them up, migrate your data, build pipelines and automations, train your team, and can manage the CRM for you every month.'],
+    ['q' => 'Which CRMs do you work with?', 'tag' => 'Services', 'a' => 'Zoho CRM, GoHighLevel, HubSpot, Salesforce and Microsoft Dynamics 365. We set them up, migrate your data, build pipelines and automations, train your team, and can manage the CRM for you every month.'],
     ['q' => 'Which industries do you know best?', 'tag' => 'General', 'a' => 'Overseas education, automobile, construction, real estate, e-commerce, scientific products and home improvement, along with healthcare, travel and local services.'],
     ['q' => 'How do you report results?', 'tag' => 'Process', 'a' => 'Regular reports with the numbers that matter — traffic, rankings, leads, cost per lead and sales — plus what we changed and what comes next.'],
     ['q' => 'What happens on the first call?', 'tag' => 'Process', 'a' => 'We look at your website, ads and social profiles together and point out the quickest wins. If we are a fit, we send a plan and get started.'],

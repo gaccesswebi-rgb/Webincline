@@ -7,8 +7,9 @@
 declare(strict_types=1);
 
 const ROUTES = [
-    '/'         => 'index.php',
-    '/services' => 'pages/services.php',
+    '/'            => 'index.php',
+    '/services'    => 'pages/services.php',
+    '/sitemap.xml' => 'pages/sitemap.php',
 ];
 
 /* Shown for any other address. */

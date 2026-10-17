@@ -5,8 +5,9 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/bootstrap.php';
 
-$page_title = 'Page not found | Webincline';
-$noindex    = true;
+$page_title       = 'Page not found | Webincline';
+$page_description = 'This page does not exist on webincline.com.';
+$noindex          = true;
 
 require __DIR__ . '/../includes/header.php';
 ?>

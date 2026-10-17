@@ -106,12 +106,14 @@
         btn.setAttribute('aria-expanded', String(open));
         $('.sr-only', btn).textContent = open ? 'Close menu' : 'Open menu';
         hd.classList.toggle('menu-open', open);
+        // the menu covers the page: take the page out of the tab order while it is open
+        ['main', 'footer', '.wa-fab', '.skip-link'].forEach((sel) => { const el = $(sel); if (el) el.inert = open; });
         if (open) {
           mm.hidden = false;
           requestAnimationFrame(() => requestAnimationFrame(() => mm.classList.add('is-open')));
           hd.classList.remove('is-lt', 'is-hid');
           if (lenis) lenis.stop(); else document.body.style.overflow = 'hidden';
-          if (motion) gsap.fromTo($$('li', mm), { y: 40, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.05, duration: 0.7, ease: 'power3.out', delay: 0.15 });
+          if (motion) gsap.fromTo($$('.mm__links > li', mm), { y: 40, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.05, duration: 0.7, ease: 'power3.out', delay: 0.15 });
         } else {
           mm.classList.remove('is-open');
           setTimeout(() => { if (!mm.classList.contains('is-open')) mm.hidden = true; }, 700);
@@ -597,6 +599,7 @@
     place();
     if (rank) rank.textContent = '#5';
     if (!play) return () => {};
+    if (!motion) { moveTo(0); return () => {}; }
     const timers = [setTimeout(() => moveTo(2), 1200), setTimeout(() => moveTo(0), 2500)];
     return () => timers.forEach(clearTimeout);
   }
@@ -685,14 +688,23 @@
     const li = $('[data-mega]');
     if (!li) return;
     const btn = $('[data-mega-toggle]', li);
+    const mega = $('.mega', li);
     let t = 0;
     const isOpen = () => li.classList.contains('is-open');
+    // centre the panel on the screen rather than on the "Services" item
+    const place = () => {
+      const r = li.getBoundingClientRect();
+      mega.style.setProperty('--mega-x', Math.round(document.documentElement.clientWidth / 2 - (r.left + r.width / 2)) + 'px');
+    };
     const set = (open) => {
       clearTimeout(t);
+      if (open) place();
       li.classList.toggle('is-open', open);
       btn.setAttribute('aria-expanded', String(open));
     };
-    btn.addEventListener('click', () => set(!isOpen()));
+    // a mouse click on the arrow opens (hovering may already have); keyboard and touch toggle
+    btn.addEventListener('click', (e) => set(fine && e.detail > 0 ? true : !isOpen()));
+    window.addEventListener('resize', () => { if (isOpen()) place(); });
     if (fine) {
       li.addEventListener('pointerenter', () => { clearTimeout(t); t = setTimeout(() => set(true), 90); });
       li.addEventListener('pointerleave', () => { clearTimeout(t); t = setTimeout(() => set(false), 220); });
@@ -759,11 +771,34 @@
         void card.offsetWidth; // restart the CSS animations
         card.classList.add('is-live');
         const box = $('[data-serp]', card);
-        if (box) stop = serpClimb(box, motion);
+        if (box) stop = serpClimb(box, true);
       };
       inView(card, play, { threshold: 0.35 });
       if (fine) card.addEventListener('pointerenter', play);
     });
+    // Two columns packed like masonry: each card goes into the shorter column and spans
+    // as many 4px rows as it is tall, so no card stretches to its neighbour. The right
+    // column starts 120px lower. DOM and tab order stay 1, 2, 3 …
+    const grid = cards[0].parentElement;
+    const wide = window.matchMedia('(min-width: 901px)');
+    const items = Array.from(grid.children);
+    const pack = () => {
+      grid.classList.toggle('is-masonry', wide.matches);
+      if (!wide.matches) { items.forEach((el) => { el.style.gridColumn = ''; el.style.gridRow = ''; }); return; }
+      const col = [0, 30];
+      items.forEach((el) => {
+        const rows = Math.ceil(el.getBoundingClientRect().height / 4) + 6; // + 24px gap
+        const c = col[0] <= col[1] ? 0 : 1;
+        el.style.gridColumn = String(c + 1);
+        el.style.gridRow = (col[c] + 1) + ' / span ' + rows;
+        col[c] += rows;
+      });
+    };
+    const ro = new ResizeObserver(() => requestAnimationFrame(pack));
+    items.forEach((el) => ro.observe(el));
+    wide.addEventListener('change', pack);
+    pack();
+
     // "Ask about …" buttons pick that service in the contact form
     $$('[data-pick]').forEach((a) => a.addEventListener('click', () => {
       const sel = $('#f-need');
@@ -777,7 +812,7 @@
     if (!box) return;
     const fmt = (tz, o) => new Intl.DateTimeFormat('en-GB', Object.assign({ timeZone: tz }, o));
     const hm = { hour: '2-digit', minute: '2-digit', hour12: false };
-    const rows = $$('[data-tz]', box).map((li) => ({ li, out: $('[data-mk-t]', li), time: fmt(li.dataset.tz, hm), day: fmt(li.dataset.tz, { weekday: 'short' }) }));
+    const rows = $$('[data-tz]', box).map((li) => ({ li, out: $('[data-mk-t]', li), st: $('[data-mk-st]', li), time: fmt(li.dataset.tz, hm), day: fmt(li.dataset.tz, { weekday: 'short' }) }));
     const home = $('[data-mk-home]', box);
     const homeTime = fmt('Asia/Kolkata', hm);
     const tick = () => {
@@ -786,8 +821,10 @@
       rows.forEach((r) => {
         const t = r.time.format(d);
         const h = parseInt(t, 10);
+        const open = h >= 9 && h < 18 && !/Sat|Sun/.test(r.day.format(d));
         r.out.textContent = t;
-        r.li.classList.toggle('is-open', h >= 9 && h < 18 && !/Sat|Sun/.test(r.day.format(d)));
+        r.li.classList.toggle('is-open', open);
+        if (r.st) r.st.textContent = open ? ', office hours now' : ', outside office hours';
       });
     };
     tick();

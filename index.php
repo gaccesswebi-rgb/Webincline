@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/includes/bootstrap.php';
 
+$page_sections = ['services', 'work', 'process', 'team', 'insights', 'faq', 'contact'];
 $page_title  = 'Webincline — Digital Marketing Agency | SEO, Ads, Websites, CRM & AI';
 
 $ring_r = ['local' => 0.3, 'regional' => 0.5, 'national' => 0.68, 'global' => 0.84];
@@ -24,7 +25,7 @@ require __DIR__ . '/includes/header.php';
     <p class="hero__hint mono" aria-hidden="true"><i class="ping"></i>Move to reach · click to launch a campaign</p>
 
     <div class="wrap hero__in">
-      <p class="note" data-hi><i class="live"></i>Taking new projects in 9 markets</p>
+      <p class="note" data-hi><i class="live"></i>Taking new projects in <?= count($site['markets']) ?> markets</p>
       <h1 class="hero__h" data-hero-title><?= title('Scaling ideas.|Building *growth.*') ?></h1>
       <p class="hero__sub" data-hi>Webincline is a digital marketing agency in Chandigarh. We run SEO, paid ads, social media, websites, CRM and AI automation that put your brand in front of people ready to buy — and we report every result in plain numbers.</p>
       <div class="hero__cta" data-hi>
@@ -43,7 +44,7 @@ require __DIR__ . '/includes/header.php';
           <li><a href="#services" data-goto-channel="<?= $i ?>"><b><?= sprintf('%02d', $i + 1) ?></b> <?= e($c['short']) ?></a></li>
         <?php endforeach; ?>
       </ul>
-      <p class="hero__meta mono">11+ years in digital<br>9 markets served</p>
+      <p class="hero__meta mono">11+ years in digital<br><?= count($site['markets']) ?> markets served</p>
     </div>
   </section>
 
@@ -55,7 +56,7 @@ require __DIR__ . '/includes/header.php';
         <h2 class="h2" data-hd><?= title('500+ brands|*on our radar.*') ?></h2>
         <p class="lead" data-rv>Clinics and colleges in Chandigarh, renovation firms in Dubai, robotics stores in Australia and service companies across Canada and the USA. Each came to us to be found by more of the right people.</p>
         <div class="cl__meta mono" data-rv>
-          <p>11+ years · 21 brands below · 9 markets</p>
+          <p>11+ years · 21 brands below · <?= count($site['markets']) ?> markets</p>
           <p><i class="live"></i>Last ping <b data-radar-out>Beauty Basket · 60× ROAS</b></p>
         </div>
       </div>
@@ -117,7 +118,7 @@ require __DIR__ . '/includes/header.php';
         <div class="head__side" data-rv>
           <p class="lead">Most businesses are not invisible. They are talking to the wrong people. We find the searches, feeds, lookalike audiences and AI answers where your buyers already spend time — and put you there.</p>
           <a class="btn btn--line" href="#team" data-mag><span class="btn__lb">Meet the team</span><span class="btn__ic"><?= icon('arrow-up') ?></span></a>
-          <ul class="facts mono"><li>Chandigarh HQ</li><li>9 markets</li><li>11+ years</li></ul>
+          <ul class="facts mono"><li>Chandigarh HQ</li><li><?= count($site['markets']) ?> markets</li><li>11+ years</li></ul>
         </div>
       </div>
 
@@ -141,10 +142,10 @@ require __DIR__ . '/includes/header.php';
       <div class="head">
         <div>
           <p class="eb" data-rv><i></i>(02) Services</p>
-          <h2 class="h2" data-hd><?= title('Twelve services.|*One* growth plan.') ?></h2>
+          <h2 class="h2" data-hd><?= title('Seven channels.|*One* growth plan.') ?></h2>
         </div>
         <div class="head__side" data-rv>
-          <p class="lead">SEO, ads, social, websites, CRM and AI automation in six channels — one team, one plan and one report.</p>
+          <p class="lead">SEO, ads, social, websites, CRM, automation and email marketing — one team, one plan and one report.</p>
           <a class="btn btn--line" href="#contact" data-mag><span class="btn__lb">Plan my channels</span><span class="btn__ic"><?= icon('arrow-up') ?></span></a>
         </div>
       </div>
@@ -170,7 +171,7 @@ require __DIR__ . '/includes/header.php';
                   </div>
                   <div class="pn__foot">
                     <span class="pn__stat mono"><i class="live"></i><?= e($c['proof']) ?></span>
-                    <a class="btn btn--solid btn--sm" href="<?= e(link_or(service_path($c['pillar']), link_or('/services', '#contact') . (page_url('/services') ? '#' . $c['pillar'] : ''))) ?>" data-mag><span class="btn__lb"><?= page_url('/services') ? 'Explore ' . e($services[$c['pillar']]['title']) : 'Talk to us' ?></span><span class="btn__ic"><?= icon('arrow-up') ?></span></a>
+                    <a class="btn btn--solid btn--sm" href="<?= e(service_link($c['pillar'])) ?>" data-mag><span class="btn__lb"><?= page_url('/services') ? 'Explore ' . e($services[$c['pillar']]['title']) : 'Talk to us' ?></span><span class="btn__ic"><?= icon('arrow-up') ?></span></a>
                   </div>
                 </div>
               </div>
@@ -397,7 +398,7 @@ require __DIR__ . '/includes/header.php';
           <p class="eb" data-rv><i></i>Client stories</p>
           <div class="rv__score" data-rv style="--d:120ms">
             <p class="rv__big">500<span>+</span></p>
-            <p class="mono rv__sub">Clients since we started<br>in 9 markets</p>
+            <p class="mono rv__sub">Clients since we started<br>in <?= count($site['markets']) ?> markets</p>
           </div>
           <h2 class="h2" data-hd><?= title('Clients who|*stay.*') ?></h2>
           <p class="lead" data-rv style="--d:480ms">What our clients say about working with us, in their own words, next to the results from their case studies.</p>

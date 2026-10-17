@@ -7,13 +7,13 @@
         <span>webincline</span>
       </a>
       <p><?= e(SITE_TAGLINE) ?> SEO, ads, social, websites, CRM and AI automation that bring the right people to your door.</p>
-      <p class="note"><i class="live"></i>Taking new projects in 9 markets</p>
+      <p class="note"><i class="live"></i>Taking new projects in <?= count($site['markets']) ?> markets</p>
       <a class="btn btn--solid btn--sm" href="<?= e($book_href) ?>" data-mag><span class="btn__lb">Book a strategy call</span><span class="btn__ic"><?= icon('calendar') ?></span></a>
     </div>
 
     <nav class="ft__col" aria-label="Services">
       <p class="mono">Services</p>
-      <ul><?php foreach ($services as $slug => $s): ?><li><a href="<?= e(link_or(service_path($slug), link_or('/services', anchor('services')) . (page_url('/services') ? '#' . $slug : ''))) ?>"><?= e($s['name']) ?></a></li><?php endforeach; ?></ul>
+      <ul><?php foreach ($services as $slug => $s): ?><li><a href="<?= e(service_link($slug)) ?>"><?= e($s['name']) ?></a></li><?php endforeach; ?></ul>
     </nav>
     <nav class="ft__col" aria-label="Company">
       <p class="mono">Company</p>
@@ -51,7 +51,7 @@
   </div>
 </footer>
 
-<a class="wa-fab" href="https://wa.me/<?= e($site['whatsapp']) ?>" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><?= icon('whatsapp') ?></a>
+<aside aria-label="WhatsApp chat"><a class="wa-fab" href="https://wa.me/<?= e($site['whatsapp']) ?>" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><?= icon('whatsapp') ?></a></aside>
 
 <script src="<?= asset('js/vendor/gsap.min.js') ?>" defer></script>
 <script src="<?= asset('js/vendor/ScrollTrigger.min.js') ?>" defer></script>
