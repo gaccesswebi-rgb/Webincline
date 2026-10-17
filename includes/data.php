@@ -246,7 +246,7 @@ $wins = [
 // captions are an English translation).
 $testimonials = [
     ['video' => 'testimonial-study-abroad', 'name' => 'Shipra Sarkar · Dubai, UAE', 'company' => 'Study Abroad Education Services', 'captions' => 'English'],
-    ['video' => 'testimonial-01',           'name' => 'Deepa',                      'company' => 'Yala Renovations LLC',           'captions' => 'English'],
+    ['video' => 'testimonial-01',           'name' => 'Deepa',                      'company' => 'Yalla Renovation LLC',            'captions' => 'English'],
     ['video' => 'testimonial-02',           'name' => 'Spoken in Hindi · English captions', 'company' => 'Hug Hafiz',              'captions' => 'English (translated from Hindi)'],
 ];
 
@@ -259,7 +259,7 @@ $reviews = [
      'text' => 'Taking your services and working with you has been a very good experience for me.'],
     ['type' => 'result', 'name' => 'Under Pressure', 'role' => 'Power washing · Florida, USA', 'logo' => '', 'chip' => '59 → 3,570 visits/mo',
      'text' => 'Local SEO over twelve months: 22 target keywords, service pages and steady link building.'],
-    ['type' => 'quote', 'name' => 'Deepa', 'role' => 'Yala Renovations LLC · on video', 'logo' => '', 'chip' => 'Video review', 'note' => '',
+    ['type' => 'quote', 'name' => 'Deepa', 'role' => 'Yalla Renovation LLC · on video', 'logo' => '', 'chip' => 'Video review', 'note' => '',
      'text' => 'It’s been a pleasure working with a team that is so creative, reliable, professional and always ready to help.'],
     ['type' => 'result', 'name' => 'RSK Fragrance House', 'role' => 'Fragrance brand · India', 'logo' => 'rsk-fragrance', 'chip' => '52 top-10 keywords',
      'text' => 'From 3 referring domains to 2,810, and from no rankings to 52 keywords in Google’s top 10.'],
