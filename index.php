@@ -48,7 +48,7 @@ require __DIR__ . '/includes/header.php';
           <li><a href="#services" data-goto-channel="<?= $i ?>"><b><?= sprintf('%02d', $i + 1) ?></b> <?= e($c['short']) ?></a></li>
         <?php endforeach; ?>
       </ul>
-      <p class="hero__meta mono">8+ years in digital<br>9 markets served</p>
+      <p class="hero__meta mono">11+ years in digital<br>9 markets served</p>
     </div>
   </section>
 
@@ -60,7 +60,7 @@ require __DIR__ . '/includes/header.php';
         <h2 class="h2" data-hd><?= title('500+ brands|*on our radar.*') ?></h2>
         <p class="lead" data-rv>Clinics and colleges in Chandigarh, renovation firms in Dubai, robotics stores in Australia and service companies across Canada and the USA. Each came to us to be found by more of the right people.</p>
         <div class="cl__meta mono" data-rv>
-          <p>8+ years · 21 brands below · 9 markets</p>
+          <p>11+ years · 21 brands below · 9 markets</p>
           <p><i class="live"></i>Last ping <b data-radar-out>Beauty Basket · 60× ROAS</b></p>
         </div>
       </div>
@@ -122,7 +122,7 @@ require __DIR__ . '/includes/header.php';
         <div class="head__side" data-rv>
           <p class="lead">Most businesses are not invisible. They are talking to the wrong people. We find the searches, feeds, lookalike audiences and AI answers where your buyers already spend time — and put you there.</p>
           <a class="btn btn--line" href="#team" data-mag><span class="btn__lb">Meet the team</span><span class="btn__ic"><?= icon('arrow-up') ?></span></a>
-          <ul class="facts mono"><li>Chandigarh HQ</li><li>9 markets</li><li>8+ years</li></ul>
+          <ul class="facts mono"><li>Chandigarh HQ</li><li>9 markets</li><li>11+ years</li></ul>
         </div>
       </div>
 

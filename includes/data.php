@@ -241,14 +241,13 @@ $wins = [
     'Juvly Aesthetics · 75 keywords in the top 10 · Apr 2017',
 ];
 
-// Video testimonials (recorded for Webincline's anniversary). Names and companies
-// are what each client says on camera, transcribed; confirm the spelling and the
-// company for testimonial-01 with the client. Captions: assets/video/<video>.vtt
-// (the Hindi clip's captions are an English translation).
+// Video testimonials (recorded for Webincline's 11th anniversary). Companies as
+// confirmed by Webincline. Captions: assets/video/<video>.vtt (the Hindi clip's
+// captions are an English translation).
 $testimonials = [
     ['video' => 'testimonial-study-abroad', 'name' => 'Shipra Sarkar · Dubai, UAE', 'company' => 'Study Abroad Education Services', 'captions' => 'English'],
-    ['video' => 'testimonial-01',           'name' => 'Deepa',                      'company' => 'Yalla Renovation',               'captions' => 'English'],
-    ['video' => 'testimonial-02',           'name' => 'Spoken in Hindi · English captions', 'company' => 'Long-time client',       'captions' => 'English (translated from Hindi)'],
+    ['video' => 'testimonial-01',           'name' => 'Deepa',                      'company' => 'Yala Renovations LLC',           'captions' => 'English'],
+    ['video' => 'testimonial-02',           'name' => 'Spoken in Hindi · English captions', 'company' => 'Hug Hafiz',              'captions' => 'English (translated from Hindi)'],
 ];
 
 // Lock-screen notifications in "Client stories". The first entry arrives first and
@@ -256,11 +255,11 @@ $testimonials = [
 // own words from their videos (verbatim excerpts, or translated where 'note' says
 // so); 'result' entries are figures from our published case studies, not quotes.
 $reviews = [
-    ['type' => 'quote', 'name' => 'Long-time client', 'role' => 'On video', 'logo' => '', 'chip' => 'Video review', 'note' => 'Translated from Hindi',
+    ['type' => 'quote', 'name' => 'Hug Hafiz', 'role' => 'Client · on video', 'logo' => '', 'chip' => 'Video review', 'note' => 'Translated from Hindi',
      'text' => 'Taking your services and working with you has been a very good experience for me.'],
     ['type' => 'result', 'name' => 'Under Pressure', 'role' => 'Power washing · Florida, USA', 'logo' => '', 'chip' => '59 → 3,570 visits/mo',
      'text' => 'Local SEO over twelve months: 22 target keywords, service pages and steady link building.'],
-    ['type' => 'quote', 'name' => 'Deepa', 'role' => 'Yalla Renovation · on video', 'logo' => '', 'chip' => 'Video review', 'note' => '',
+    ['type' => 'quote', 'name' => 'Deepa', 'role' => 'Yala Renovations LLC · on video', 'logo' => '', 'chip' => 'Video review', 'note' => '',
      'text' => 'It’s been a pleasure working with a team that is so creative, reliable, professional and always ready to help.'],
     ['type' => 'result', 'name' => 'RSK Fragrance House', 'role' => 'Fragrance brand · India', 'logo' => 'rsk-fragrance', 'chip' => '52 top-10 keywords',
      'text' => 'From 3 referring domains to 2,810, and from no rankings to 52 keywords in Google’s top 10.'],
